@@ -1,3 +1,7 @@
+---
+type: "agent_requested"
+description: "Example description"
+---
 # BLONG Consolidated Development Rules
 
 ## 🎯 CORE PRINCIPLES
