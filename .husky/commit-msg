@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "📝 Validating commit message..."
+
+# Navigate to backend directory
+cd backend
+
+# Run commitlint
+npx --no-install commitlint --edit "$1"

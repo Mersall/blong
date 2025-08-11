@@ -1,0 +1,44 @@
+{
+  "name": "blong",
+  "version": "1.0.0",
+  "description": "BLONG - A comprehensive matrimonial app with Arabic/English localization",
+  "private": true,
+  "scripts": {
+    "frontend": "cd frontend && npm start",
+    "frontend:web": "cd frontend && npm run web",
+    "frontend:android": "cd frontend && npm run android",
+    "frontend:ios": "cd frontend && npm run ios",
+    "backend": "cd backend && npm run start:dev",
+    "backend:build": "cd backend && npm run build",
+    "install:all": "npm run install:frontend && npm run install:backend",
+    "install:frontend": "cd frontend && npm install",
+    "install:backend": "cd backend && npm install",
+    "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
+    "clean": "rm -rf node_modules frontend/node_modules backend/node_modules"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "keywords": [
+    "matrimonial",
+    "dating",
+    "wedding",
+    "arabic",
+    "localization",
+    "react-native",
+    "nestjs"
+  ],
+  "author": "BLONG Team",
+  "license": "MIT",
+  "dependencies": {
+    "@react-native-async-storage/async-storage": "^2.1.2",
+    "@react-native-community/datetimepicker": "^8.4.1",
+    "@react-native-community/slider": "^4.5.6",
+    "@sentry/react-native": "~6.14.0",
+    "expo-local-authentication": "^16.0.5",
+    "react-native-gesture-handler": "~2.24.0",
+    "react-native-safe-area-context": "^5.4.0",
+    "react-native-screens": "~4.11.1",
+    "react-native-svg": "^15.11.2"
+  }
+}

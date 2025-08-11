@@ -1,0 +1,187 @@
+name: BLONG CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  # Backend Testing and Quality Checks
+  backend-test:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: blong_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: backend/package-lock.json
+    
+    - name: Install backend dependencies
+      run: |
+        cd backend
+        npm ci
+    
+    - name: Setup test environment
+      run: |
+        cd backend
+        cp .env.example .env
+        echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/blong_test" >> .env
+        echo "JWT_SECRET=test-jwt-secret-for-ci-pipeline" >> .env
+    
+    - name: Run database migrations
+      run: |
+        cd backend
+        npx prisma generate
+        npx prisma db push
+    
+    - name: Run backend tests
+      run: |
+        cd backend
+        npm run test
+    
+    - name: Run test coverage
+      run: |
+        cd backend
+        npm run test:cov
+    
+    - name: Lint backend code
+      run: |
+        cd backend
+        npm run lint
+    
+    - name: Build backend
+      run: |
+        cd backend
+        npm run build
+
+  # Frontend Testing and Quality Checks
+  frontend-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+    
+    - name: Install frontend dependencies
+      run: |
+        cd frontend
+        npm ci
+    
+    - name: Run frontend tests (when implemented)
+      run: |
+        cd frontend
+        # npm run test (uncomment when tests are added)
+        echo "Frontend tests will be added in future iterations"
+    
+    - name: Check Expo configuration
+      run: |
+        cd frontend
+        npx expo doctor
+
+  # Security Scanning
+  security-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+    
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+  # Code Quality Analysis
+  code-quality:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: SonarCloud Scan
+      uses: SonarSource/sonarcloud-github-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  # Build and Deploy (only on main branch)
+  deploy:
+    needs: [backend-test, frontend-test, security-scan]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Build backend for production
+      run: |
+        cd backend
+        npm ci
+        npm run build
+    
+    - name: Build frontend for production
+      run: |
+        cd frontend
+        npm ci
+        # npx expo build:web (when ready for deployment)
+    
+    - name: Deploy to staging
+      run: |
+        echo "Deployment steps would go here"
+        echo "This could include Docker builds, cloud deployments, etc."
+
+  # Notify on completion
+  notify:
+    needs: [backend-test, frontend-test, security-scan, code-quality]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - name: Notify team
+      run: |
+        echo "CI/CD pipeline completed"
+        echo "Backend tests: ${{ needs.backend-test.result }}"
+        echo "Frontend tests: ${{ needs.frontend-test.result }}"
+        echo "Security scan: ${{ needs.security-scan.result }}"
+        echo "Code quality: ${{ needs.code-quality.result }}"

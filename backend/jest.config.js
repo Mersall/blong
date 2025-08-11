@@ -1,0 +1,46 @@
+module.exports = {
+  preset: 'ts-jest',
+  testEnvironment: 'node',
+  rootDir: '.',
+  roots: ['<rootDir>/src', '<rootDir>/test'],
+  moduleFileExtensions: ['js', 'json', 'ts'],
+  testRegex: '.*\\.(spec|test)\\.ts$',
+  transform: {
+    '^.+\\.ts$': 'ts-jest',
+    '^.+\\.js$': 'babel-jest',
+  },
+  transformIgnorePatterns: [
+    'node_modules/(?!(@prisma|prisma))',
+  ],
+  collectCoverageFrom: [
+    'src/**/*.ts',
+    '!src/**/*.spec.ts',
+    '!src/**/*.test.ts',
+    '!src/**/*.d.ts',
+    '!src/**/*.interface.ts',
+    '!src/**/*.enum.ts',
+    '!src/**/*.module.ts',
+    '!src/main.ts',
+    '!src/main-secure.ts',
+    '!src/test/**',
+  ],
+  coverageDirectory: './coverage',
+  coverageReporters: ['text', 'lcov', 'html', 'json-summary'],
+  coverageThreshold: {
+    global: {
+      branches: 60,
+      functions: 60,
+      lines: 60,
+      statements: 60,
+    },
+  },
+  setupFilesAfterEnv: ['<rootDir>/src/test/setup.ts'],
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/src/$1',
+    '^src/(.*)$': '<rootDir>/src/$1',
+  },
+  testTimeout: 30000,
+  verbose: true,
+  detectOpenHandles: true,
+  forceExit: true,
+};

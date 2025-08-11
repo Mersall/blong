@@ -1,0 +1,50 @@
+
+> frontend@1.0.0 start
+> expo start
+
+env: load .env
+env: export EXPO_PUBLIC_API_BASE_URL EXPO_PUBLIC_API_BASE_URL_ANDROID EXPO_PUBLIC_API_TIMEOUT EXPO_PUBLIC_NODE_ENV EXPO_PUBLIC_ENABLE_MOCK_DATA EXPO_PUBLIC_ENABLE_DEBUG_LOGS EXPO_PUBLIC_APP_NAME EXPO_PUBLIC_APP_VERSION EXPO_PUBLIC_REQUEST_RETRY_ATTEMPTS EXPO_PUBLIC_REQUEST_RETRY_DELAY EXPO_PUBLIC_CACHE_STALE_TIME EXPO_PUBLIC_CACHE_GC_TIME
+Starting project at /Users/mersall/Desktop/BLONG/frontend
+Starting Metro Bundler
+The following packages should be updated for best compatibility with the installed expo version:
+  @react-native-async-storage/async-storage@2.2.0 - expected version: 2.1.2
+  @react-native-community/datetimepicker@8.4.2 - expected version: 8.4.1
+  @react-native-community/slider@4.5.7 - expected version: 4.5.6
+  react-native-gesture-handler@2.27.2 - expected version: ~2.24.0
+  react-native-safe-area-context@5.5.2 - expected version: 5.4.0
+  react-native-screens@4.13.1 - expected version: ~4.11.1
+  react-native-svg@15.12.0 - expected version: 15.11.2
+  @sentry/react-native@6.19.0 - expected version: ~6.14.0
+Your project may not work correctly until you install the expected versions of the packages.
+Waiting on http://localhost:8081
+Logs for your project will appear below.
+iOS ./index.js ▓░░░░░░░░░░░░░░░ 11.5% ( 87/256)
+iOS Bundled 735ms index.js (1284 modules)
+ WARN  The global process.env.EXPO_OS is not defined. This should be inlined by babel-preset-expo during transformation.
+ LOG  🔧 Environment Configuration: {"API_BASE_URL": "http://192.168.1.8:3000/api", "ENABLE_MOCK_DATA": true, "IS_DEV": true, "NODE_ENV": "development", "PLATFORM": "ios"}
+ LOG  🔍 Testing API connectivity...
+ LOG  � Using Real Backend API - Mock data disabled
+ LOG  i18next: languageChanged en
+ LOG  i18next: initialized {"appendNamespaceToCIMode": false, "appendNamespaceToMissingKey": false, "cache": {"enabled": true}, "cacheInBuiltFormats": true, "contextSeparator": "_", "debug": true, "defaultNS": "translation", "detection": {"asyncStorage": {"clear": [Function clear], "flushGetRequests": [Function flushGetRequests], "getAllKeys": [Function getAllKeys], "getItem": [Function getItem], "mergeItem": [Function mergeItem], "multiGet": [Function multiGet], "multiMerge": [Function multiMerge], "multiRemove": [Function multiRemove], "multiSet": [Function multiSet], "removeItem": [Function removeItem], "setItem": [Function setItem]}, "caches": ["asyncStorage"], "order": ["asyncStorage"]}, "fallbackLng": ["en"], "fallbackNS": false, "ignoreJSONStructure": true, "initAsync": true, "interpolation": {"escapeValue": false, "format": [Function bound format], "formatSeparator": ",", "maxReplaces": 1000, "nestingOptionsSeparator": ",", "nestingPrefix": "$t(", "nestingSuffix": ")", "prefix": "{{", "skipOnVariables": true, "suffix": "}}", "unescapePrefix": "-"}, "joinArrays": false, "keySeparator": ".", "lng": "en", "load": "all", "missingInterpolationHandler": false, "missingKeyHandler": false, "nonExplicitSupportedLngs": false, "ns": ["translation"], "nsSeparator": ":", "overloadTranslationOptionHandler": [Function overloadTranslationOptionHandler], "parseMissingKeyHandler": false, "partialBundledLanguages": false, "pluralSeparator": "_", "postProcess": false, "postProcessPassResolved": false, "preload": false, "react": {"useSuspense": false}, "resources": {"ar": {"translation": [Object]}, "en": {"translation": [Object]}, "es": {"translation": [Object]}, "fr": {"translation": [Object]}}, "returnEmptyString": true, "returnNull": false, "returnObjects": false, "returnedObjectHandler": false, "saveMissing": false, "saveMissingPlurals": true, "saveMissingTo": "fallback", "simplifyPluralSuffix": true, "supportedLngs": false, "updateMissing": false}
+ LOG  🚀 Loading saved data, attempt: 1
+ LOG  📡 Network state changed: true
+ LOG  📡 Network state changed: true
+ LOG  📡 Network state changed: true
+ LOG  📡 Network state changed: true
+ LOG  i18next: languageChanged en
+ LOG  App initialized: {"language": "en"}
+ LOG  ✅ User is authenticated: mersal765666@gmail.com
+ LOG  🔍 Checking profile completion status...
+ LOG  ✅ API Health Check Success: 200
+ LOG  📊 API Health Data: {"message": "BLONG Backend API is running", "status": "ok", "timestamp": "2025-08-02T00:50:51.899Z", "version": "1.0.0"}
+ LOG  📡 Network state changed: true
+ LOG  📊 Profile completion status: {"data": {"nextSteps": [[Object], [Object], [Object]], "overall": {"completed": false, "completedSections": 1, "percentage": 25, "totalSections": 4}, "sections": {"basicInfo": [Object], "photos": [Object], "preferences": [Object], "profileDetails": [Object]}}}
+ LOG  🎯 Profile completion result: false
+ LOG  📝 Showing ProfileCompletionFlow - profile incomplete
+ LOG  🔍 DatePicker state: false Platform: ios
+ LOG  🚀 Date picker button pressed for platform: ios
+ LOG  📅 Current showDatePicker state: false
+ LOG  🔧 setShowDatePicker function type: function
+ LOG  ✅ Date picker should now be visible
+ LOG  🔍 DatePicker state: true Platform: ios
+ LOG  🔍 DatePicker state: false Platform: ios

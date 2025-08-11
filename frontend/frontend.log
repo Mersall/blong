@@ -1,0 +1,25 @@
+
+> frontend@1.0.0 start
+> expo start
+
+env: load .env
+env: export EXPO_PUBLIC_API_BASE_URL EXPO_PUBLIC_API_BASE_URL_ANDROID EXPO_PUBLIC_API_TIMEOUT EXPO_PUBLIC_NODE_ENV EXPO_PUBLIC_ENABLE_MOCK_DATA EXPO_PUBLIC_ENABLE_DEBUG_LOGS EXPO_PUBLIC_APP_NAME EXPO_PUBLIC_APP_VERSION EXPO_PUBLIC_REQUEST_RETRY_ATTEMPTS EXPO_PUBLIC_REQUEST_RETRY_DELAY EXPO_PUBLIC_CACHE_STALE_TIME EXPO_PUBLIC_CACHE_GC_TIME
+Starting project at /Users/mersall/Desktop/BLONG/frontend
+Starting Metro Bundler
+The following packages should be updated for best compatibility with the installed expo version:
+  @react-native-async-storage/async-storage@2.2.0 - expected version: 2.1.2
+  @react-native-community/datetimepicker@8.4.2 - expected version: 8.4.1
+  @react-native-community/slider@4.5.7 - expected version: 4.5.6
+  react-native-gesture-handler@2.27.2 - expected version: ~2.24.0
+  react-native-safe-area-context@5.5.2 - expected version: 5.4.0
+  react-native-screens@4.13.1 - expected version: ~4.11.1
+  react-native-svg@15.12.0 - expected version: 15.11.2
+  @sentry/react-native@6.19.0 - expected version: ~6.14.0
+Your project may not work correctly until you install the expected versions of the packages.
+Waiting on http://localhost:8081
+Logs for your project will appear below.
+npm notice
+npm notice New major version of npm available! 10.9.2 -> 11.5.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.5.2
+npm notice To update run: npm install -g npm@11.5.2
+npm notice

@@ -1,0 +1,135 @@
+config:
+  target: 'http://localhost:3000'
+  phases:
+    - duration: 60
+      arrivalRate: 5
+      name: "Warm up"
+    - duration: 120
+      arrivalRate: 10
+      rampTo: 50
+      name: "Ramp up load"
+    - duration: 180
+      arrivalRate: 50
+      name: "Sustained load"
+    - duration: 60
+      arrivalRate: 50
+      rampTo: 5
+      name: "Ramp down"
+  defaults:
+    headers:
+      Content-Type: 'application/json'
+
+scenarios:
+  - name: "Health Check"
+    weight: 10
+    flow:
+      - get:
+          url: "/api/health"
+          expect:
+            - statusCode: 200
+            - contentType: json
+            - hasProperty: status
+
+  - name: "User Registration"
+    weight: 20
+    flow:
+      - post:
+          url: "/api/auth/register"
+          json:
+            email: "test{{ $randomString() }}@example.com"
+            password: "TestPassword123!"
+            firstName: "Test"
+            lastName: "User"
+            dateOfBirth: "1990-01-01"
+            gender: "MALE"
+            phone: "+1234567890"
+          expect:
+            - statusCode: 201
+            - contentType: json
+            - hasProperty: user
+            - hasProperty: accessToken
+
+  - name: "User Login"
+    weight: 30
+    flow:
+      - post:
+          url: "/api/auth/register"
+          json:
+            email: "user{{ $randomString() }}@example.com"
+            password: "TestPassword123!"
+            firstName: "Test"
+            lastName: "User"
+            dateOfBirth: "1990-01-01"
+            gender: "MALE"
+            phone: "+1234567890"
+          capture:
+            - json: "$.user.email"
+              as: "userEmail"
+      - post:
+          url: "/api/auth/login"
+          json:
+            email: "{{ userEmail }}"
+            password: "TestPassword123!"
+          expect:
+            - statusCode: 200
+            - contentType: json
+            - hasProperty: accessToken
+          capture:
+            - json: "$.accessToken"
+              as: "token"
+
+  - name: "Authenticated User Profile"
+    weight: 25
+    flow:
+      - post:
+          url: "/api/auth/register"
+          json:
+            email: "profile{{ $randomString() }}@example.com"
+            password: "TestPassword123!"
+            firstName: "Profile"
+            lastName: "User"
+            dateOfBirth: "1990-01-01"
+            gender: "FEMALE"
+            phone: "+1234567890"
+          capture:
+            - json: "$.accessToken"
+              as: "authToken"
+      - get:
+          url: "/api/auth/me"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+            - contentType: json
+            - hasProperty: id
+
+  - name: "Quiz System"
+    weight: 15
+    flow:
+      - post:
+          url: "/api/auth/register"
+          json:
+            email: "quiz{{ $randomString() }}@example.com"
+            password: "TestPassword123!"
+            firstName: "Quiz"
+            lastName: "User"
+            dateOfBirth: "1990-01-01"
+            gender: "MALE"
+            phone: "+1234567890"
+          capture:
+            - json: "$.accessToken"
+              as: "quizToken"
+      - get:
+          url: "/api/quiz/categories"
+          headers:
+            Authorization: "Bearer {{ quizToken }}"
+          expect:
+            - statusCode: 200
+            - contentType: json
+
+# Performance thresholds
+expect:
+  - statusCode: [200, 201]
+  - maxResponseTime: 200  # All responses should be under 200ms
+  - p95: 150             # 95% of responses should be under 150ms
+  - p99: 300             # 99% of responses should be under 300ms

@@ -1,0 +1,1200 @@
+openapi: 3.0.0
+info:
+  title: BLONG API
+  description: 'BLONG - Personality assessment and date preparation app API documentation'
+  version: 1.0.0
+  contact:
+    name: BLONG API Support
+    email: support@blong.app
+  license:
+    name: Proprietary
+    url: https://blong.app/license
+
+servers:
+  - url: http://localhost:3000/api
+    description: Development server
+  - url: https://api.blong.app/api
+    description: Production server
+
+security:
+  - BearerAuth: []
+
+paths:
+  # Root and Health Endpoints
+  /:
+    get:
+      summary: API Root
+      description: Basic API root endpoint
+      tags:
+        - health
+      responses:
+        '200':
+          description: Welcome message
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Hello World!"
+
+  /health:
+    get:
+      summary: Basic Health Check
+      description: Simple health check endpoint
+      tags:
+        - health
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "ok"
+                  message:
+                    type: string
+                    example: "BLONG Backend API is running"
+                  timestamp:
+                    type: string
+                    format: date-time
+                    example: "2025-08-01T23:44:07.000Z"
+                  version:
+                    type: string
+                    example: "1.0.0"
+
+  /health/detailed:
+    get:
+      summary: Detailed Health Check
+      description: Comprehensive health status including database connectivity
+      tags:
+        - health
+      responses:
+        '200':
+          description: Detailed health information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  timestamp:
+                    type: string
+                    format: date-time
+                  uptime:
+                    type: number
+                    description: Server uptime in seconds
+                  status:
+                    type: string
+                    example: "healthy"
+                  services:
+                    type: object
+                    properties:
+                      database:
+                        type: object
+                        properties:
+                          status:
+                            type: string
+                            example: "connected"
+                          latency:
+                            type: number
+                            description: Database response time in ms
+
+  /health/ready:
+    get:
+      summary: Readiness Check
+      description: Check if the service is ready to accept traffic
+      tags:
+        - health
+      responses:
+        '200':
+          description: Service is ready
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "ready"
+                  timestamp:
+                    type: string
+                    format: date-time
+        '503':
+          description: Service not ready
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /health/live:
+    get:
+      summary: Liveness Check
+      description: Check if the service is alive
+      tags:
+        - health
+      responses:
+        '200':
+          description: Service is alive
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "alive"
+                  timestamp:
+                    type: string
+                    format: date-time
+                  uptime:
+                    type: number
+                  pid:
+                    type: number
+                  memory:
+                    type: object
+                    properties:
+                      rss:
+                        type: number
+                      heapTotal:
+                        type: number
+                      heapUsed:
+                        type: number
+                      external:
+                        type: number
+
+  # Authentication Endpoints
+  /auth/register:
+    post:
+      summary: Register New User
+      description: Create a new user account with email and password
+      tags:
+        - auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterDto'
+            examples:
+              valid_user:
+                summary: Valid user registration
+                value:
+                  email: "john.doe@example.com"
+                  password: "SecurePassword123!"
+                  firstName: "John"
+                  lastName: "Doe"
+                  dateOfBirth: "1990-01-15"
+                  gender: "MALE"
+      responses:
+        '201':
+          description: User successfully registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Invalid input data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+              examples:
+                validation_error:
+                  summary: Validation errors
+                  value:
+                    statusCode: 400
+                    message: 
+                      - "email must be an email"
+                      - "password must be longer than or equal to 8 characters"
+                    error: "Bad Request"
+        '409':
+          description: User with this email already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                duplicate_email:
+                  summary: Email already exists
+                  value:
+                    statusCode: 409
+                    message: "User with this email already exists"
+                    error: "Conflict"
+
+  /auth/login:
+    post:
+      summary: User Login
+      description: Authenticate user with email and password
+      tags:
+        - auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginDto'
+            examples:
+              valid_login:
+                summary: Valid login credentials
+                value:
+                  email: "john.doe@example.com"
+                  password: "SecurePassword123!"
+      responses:
+        '200':
+          description: User successfully logged in
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Invalid input data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalid_credentials:
+                  summary: Wrong email or password
+                  value:
+                    statusCode: 401
+                    message: "Invalid credentials"
+                    error: "Unauthorized"
+
+  /auth/refresh:
+    post:
+      summary: Refresh JWT Token
+      description: Get new access and refresh tokens using a valid refresh token
+      tags:
+        - auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenDto'
+      responses:
+        '200':
+          description: Tokens successfully refreshed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '401':
+          description: Invalid or expired refresh token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/me:
+    get:
+      summary: Get Current User
+      description: Get information about the currently authenticated user
+      tags:
+        - auth
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Current user information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Invalid or missing JWT token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # Profile Endpoints
+  /profile:
+    get:
+      summary: Get User Profile
+      description: Retrieve the current user's profile information
+      tags:
+        - profile
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: User profile data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Profile not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      summary: Update User Profile
+      description: Update the current user's profile information
+      tags:
+        - profile
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProfileDto'
+            examples:
+              basic_profile:
+                summary: Basic profile update
+                value:
+                  bio: "Passionate about life and looking for meaningful connections"
+                  height: 175
+                  education: "Bachelor's Degree"
+                  occupation: "Software Engineer"
+                  city: "New York"
+                  country: "United States"
+                  interests: ["technology", "travel", "cooking"]
+                  smoking: "NEVER"
+                  drinking: "OCCASIONALLY"
+                  exercise: "REGULARLY"
+      responses:
+        '200':
+          description: Profile successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '400':
+          description: Invalid profile data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /profile/preferences:
+    get:
+      summary: Get User Preferences
+      description: Retrieve the current user's matching preferences
+      tags:
+        - profile
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: User preferences data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPreferences'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      summary: Update User Preferences
+      description: Update the current user's matching preferences
+      tags:
+        - profile
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePreferencesDto'
+      responses:
+        '200':
+          description: Preferences successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPreferences'
+        '400':
+          description: Invalid preferences data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /profile/photos:
+    get:
+      summary: Get User Photos
+      description: Retrieve all photos for the current user
+      tags:
+        - profile
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: List of user photos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Photo'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      summary: Upload Profile Photo
+      description: Upload a new photo for the user's profile
+      tags:
+        - profile
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UploadPhotoDto'
+      responses:
+        '201':
+          description: Photo successfully uploaded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Photo'
+        '400':
+          description: Invalid photo data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /profile/photos/{photoId}:
+    delete:
+      summary: Delete Photo
+      description: Delete a specific photo by ID
+      tags:
+        - profile
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: photoId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Photo ID to delete
+      responses:
+        '204':
+          description: Photo successfully deleted
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Photo not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /profile/photos/{photoId}/primary:
+    put:
+      summary: Set Primary Photo
+      description: Set a specific photo as the primary profile photo
+      tags:
+        - profile
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: photoId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Photo ID to set as primary
+      responses:
+        '200':
+          description: Primary photo successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Photo'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Photo not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /profile/completion-status:
+    get:
+      summary: Get Profile Completion Status
+      description: Get the completion status and progress of the user's profile
+      tags:
+        - profile
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Profile completion status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileCompletionStatus'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token for authentication
+
+  schemas:
+    # Request DTOs
+    RegisterDto:
+      type: object
+      required:
+        - email
+        - password
+        - firstName
+        - lastName
+        - dateOfBirth
+        - gender
+      properties:
+        email:
+          type: string
+          format: email
+          description: User email address
+          example: "john.doe@example.com"
+        password:
+          type: string
+          minLength: 8
+          description: User password (minimum 8 characters)
+          example: "SecurePassword123!"
+        firstName:
+          type: string
+          minLength: 1
+          description: User first name
+          example: "John"
+        lastName:
+          type: string
+          minLength: 1
+          description: User last name
+          example: "Doe"
+        dateOfBirth:
+          type: string
+          format: date
+          description: User date of birth
+          example: "1990-01-15"
+        gender:
+          type: string
+          enum: ["MALE", "FEMALE", "NON_BINARY", "OTHER"]
+          description: User gender
+          example: "MALE"
+
+    LoginDto:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          description: User email address
+          example: "john.doe@example.com"
+        password:
+          type: string
+          description: User password
+          example: "SecurePassword123!"
+
+    RefreshTokenDto:
+      type: object
+      required:
+        - refreshToken
+      properties:
+        refreshToken:
+          type: string
+          description: Valid refresh token
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+    UpdateProfileDto:
+      type: object
+      properties:
+        bio:
+          type: string
+          description: User biography
+          example: "Passionate about life and looking for meaningful connections"
+        height:
+          type: integer
+          description: Height in centimeters
+          example: 175
+        education:
+          type: string
+          description: Education level
+          example: "Bachelor's Degree"
+        occupation:
+          type: string
+          description: Current occupation
+          example: "Software Engineer"
+        city:
+          type: string
+          description: City of residence
+          example: "New York"
+        country:
+          type: string
+          description: Country of residence
+          example: "United States"
+        latitude:
+          type: number
+          format: float
+          description: Location latitude
+        longitude:
+          type: number
+          format: float
+          description: Location longitude
+        interests:
+          type: array
+          items:
+            type: string
+          description: User interests
+          example: ["technology", "travel", "cooking"]
+        smoking:
+          type: string
+          enum: ["NEVER", "OCCASIONALLY", "REGULARLY"]
+          description: User smoking habits
+          example: "NEVER"
+        drinking:
+          type: string
+          enum: ["NEVER", "OCCASIONALLY", "REGULARLY"]
+          description: User drinking habits
+          example: "OCCASIONALLY"
+        exercise:
+          type: string
+          enum: ["NEVER", "OCCASIONALLY", "REGULARLY"]
+          description: User exercise habits
+          example: "REGULARLY"
+        diet:
+          type: string
+          enum: ["VEGETARIAN", "VEGAN", "HALAL", "KOSHER", "NONE"]
+          description: User dietary preferences
+        maritalStatus:
+          type: string
+          enum: ["NEVER_MARRIED", "DIVORCED", "WIDOWED"]
+          description: User marital status
+        hasChildren:
+          type: boolean
+          description: Whether user has children
+        wantsChildren:
+          type: boolean
+          description: Whether user wants children
+        familyValues:
+          type: string
+          enum: ["TRADITIONAL", "MODERN", "MIXED"]
+          description: User family values
+        religion:
+          type: string
+          description: User religion
+        religiosity:
+          type: string
+          enum: ["VERY_RELIGIOUS", "SOMEWHAT_RELIGIOUS", "NOT_RELIGIOUS"]
+          description: User religiosity level
+        prayerFrequency:
+          type: string
+          enum: ["DAILY", "WEEKLY", "OCCASIONALLY", "NEVER"]
+          description: User prayer frequency
+        ethnicity:
+          type: string
+          description: User ethnicity
+        languages:
+          type: array
+          items:
+            type: string
+          description: Languages spoken
+        salaryMin:
+          type: integer
+          description: Minimum salary range
+        salaryMax:  
+          type: integer
+          description: Maximum salary range
+        weight:
+          type: integer
+          description: Weight in kilograms
+
+    UpdatePreferencesDto:
+      type: object
+      properties:
+        minAge:
+          type: integer
+          minimum: 18
+          maximum: 100
+          description: Minimum age preference
+          example: 25
+        maxAge:
+          type: integer
+          minimum: 18
+          maximum: 100
+          description: Maximum age preference
+          example: 35
+        minHeight:
+          type: integer
+          description: Minimum height preference in cm
+        maxHeight:
+          type: integer
+          description: Maximum height preference in cm
+        maxDistance:
+          type: integer
+          description: Maximum distance preference in km
+          example: 50
+        education:
+          type: array
+          items:
+            type: string
+          description: Preferred education levels
+        occupation:
+          type: array
+          items:
+            type: string
+          description: Preferred occupations
+        interests:
+          type: array
+          items:
+            type: string
+          description: Preferred interests
+        dealBreakers:
+          type: array
+          items:
+            type: string
+          description: Deal breaker preferences
+
+    UploadPhotoDto:
+      type: object
+      required:
+        - url
+      properties:
+        url:
+          type: string
+          format: uri
+          description: Photo URL
+          example: "https://example.com/photo.jpg"
+        isPrimary:
+          type: boolean
+          description: Whether this is the primary photo
+          default: false
+
+    # Response DTOs
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          description: User unique identifier
+          example: "clxxxxx"
+        email:
+          type: string
+          format: email
+          description: User email address
+          example: "john.doe@example.com"
+        firstName:
+          type: string
+          description: User first name
+          example: "John"
+        lastName:
+          type: string
+          description: User last name
+          example: "Doe"
+        dateOfBirth:
+          type: string
+          format: date-time
+          description: User date of birth
+          example: "1990-01-15T00:00:00.000Z"
+        gender:
+          type: string
+          enum: ["MALE", "FEMALE", "NON_BINARY", "OTHER"]
+          description: User gender
+          example: "MALE"
+        phone:
+          type: string
+          nullable: true
+          description: User phone number
+          example: "+1234567890"
+        isVerified:
+          type: boolean
+          description: Whether user email is verified
+          example: false
+        verificationStatus:
+          type: string
+          enum: ["PENDING", "VERIFIED", "REJECTED"]
+          description: User verification status
+          example: "PENDING"
+        relationshipStatus:
+          type: string
+          enum: ["SINGLE", "ENGAGED", "MARRIED"]
+          description: User relationship status
+          example: "SINGLE"
+        createdAt:
+          type: string
+          format: date-time
+          description: User account creation date
+          example: "2023-01-01T00:00:00.000Z"
+
+    AuthResponse:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/User'
+        accessToken:
+          type: string
+          description: JWT access token
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        refreshToken:
+          type: string
+          description: JWT refresh token
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        message:
+          type: string
+          description: Success message
+          example: "Registration successful. Please check your email to verify your account."
+
+    TokenResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          description: New JWT access token
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        refreshToken:
+          type: string
+          description: New JWT refresh token
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Profile unique identifier
+        userId:
+          type: string
+          description: Associated user ID
+        bio:
+          type: string
+          nullable: true
+          description: User biography
+        height:
+          type: integer
+          nullable: true
+          description: Height in centimeters
+        education:
+          type: string
+          nullable: true
+          description: Education level
+        occupation:
+          type: string
+          nullable: true
+          description: Current occupation
+        city:
+          type: string
+          description: City of residence
+        country:
+          type: string
+          description: Country of residence
+        latitude:
+          type: number
+          format: float
+          nullable: true
+          description: Location latitude
+        longitude:
+          type: number
+          format: float
+          nullable: true
+          description: Location longitude
+        interests:
+          type: array
+          items:
+            type: string
+          description: User interests
+        smoking:
+          type: string
+          enum: ["NEVER", "OCCASIONALLY", "REGULARLY"]
+          description: User smoking habits
+        drinking:
+          type: string
+          enum: ["NEVER", "OCCASIONALLY", "REGULARLY"]
+          description: User drinking habits
+        exercise:
+          type: string
+          enum: ["NEVER", "OCCASIONALLY", "REGULARLY"]
+          description: User exercise habits
+        diet:
+          type: string
+          enum: ["VEGETARIAN", "VEGAN", "HALAL", "KOSHER", "NONE"]
+          nullable: true
+          description: User dietary preferences
+        maritalStatus:
+          type: string
+          enum: ["NEVER_MARRIED", "DIVORCED", "WIDOWED"]
+          description: User marital status
+        hasChildren:
+          type: boolean
+          description: Whether user has children
+        wantsChildren:
+          type: boolean
+          description: Whether user wants children
+        familyValues:
+          type: string
+          enum: ["TRADITIONAL", "MODERN", "MIXED"]
+          description: User family values
+        religion:
+          type: string
+          nullable: true
+          description: User religion
+        religiosity:
+          type: string
+          enum: ["VERY_RELIGIOUS", "SOMEWHAT_RELIGIOUS", "NOT_RELIGIOUS"]
+          description: User religiosity level
+        prayerFrequency:
+          type: string
+          enum: ["DAILY", "WEEKLY", "OCCASIONALLY", "NEVER"]
+          nullable: true
+          description: User prayer frequency
+        ethnicity:
+          type: string
+          nullable: true
+          description: User ethnicity
+        languages:
+          type: array
+          items:
+            type: string
+          description: Languages spoken
+        salaryMin:
+          type: integer
+          nullable: true
+          description: Minimum salary range
+        salaryMax:
+          type: integer
+          nullable: true
+          description: Maximum salary range
+        weight:
+          type: integer
+          nullable: true
+          description: Weight in kilograms
+        createdAt:
+          type: string
+          format: date-time
+          description: Profile creation date
+        updatedAt:
+          type: string
+          format: date-time
+          description: Profile last update date
+
+    UserPreferences:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Preferences unique identifier
+        userId:
+          type: string
+          description: Associated user ID
+        minAge:
+          type: integer
+          description: Minimum age preference
+        maxAge:
+          type: integer
+          description: Maximum age preference
+        minHeight:
+          type: integer
+          nullable: true
+          description: Minimum height preference in cm
+        maxHeight:
+          type: integer
+          nullable: true
+          description: Maximum height preference in cm
+        maxDistance:
+          type: integer
+          description: Maximum distance preference in km
+        education:
+          type: array
+          items:
+            type: string
+          description: Preferred education levels
+        occupation:
+          type: array
+          items:
+            type: string
+          description: Preferred occupations
+        interests:
+          type: array
+          items:
+            type: string
+          description: Preferred interests
+        dealBreakers:
+          type: array
+          items:
+            type: string
+          description: Deal breaker preferences
+        createdAt:
+          type: string
+          format: date-time
+          description: Preferences creation date
+        updatedAt:
+          type: string
+          format: date-time
+          description: Preferences last update date
+
+    Photo:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Photo unique identifier
+        userId:
+          type: string
+          description: Associated user ID
+        url:
+          type: string
+          format: uri
+          description: Photo URL
+        isPrimary:
+          type: boolean
+          description: Whether this is the primary photo
+        order:
+          type: integer
+          description: Display order
+        uploadedAt:
+          type: string
+          format: date-time
+          description: Photo upload date
+
+    ProfileCompletionStatus:
+      type: object
+      properties:
+        completionPercentage:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 100
+          description: Profile completion percentage
+          example: 75.5
+        completedSections:
+          type: array
+          items:
+            type: string
+          description: List of completed profile sections
+          example: ["basicInfo", "preferences", "photos"]
+        missingSections:
+          type: array
+          items:
+            type: string
+          description: List of missing profile sections
+          example: ["personality", "lifestyle"]
+        isComplete:
+          type: boolean
+          description: Whether profile is fully complete
+          example: false
+        nextStep:
+          type: string
+          description: Suggested next step for completion
+          example: "Complete personality assessment"
+
+    # Error Schemas
+    ErrorResponse:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          description: HTTP status code
+          example: 400
+        message:
+          type: string
+          description: Error message
+          example: "Invalid request"
+        error:
+          type: string
+          description: Error type
+          example: "Bad Request"
+        timestamp:
+          type: string
+          format: date-time
+          description: Error timestamp
+        path:
+          type: string
+          description: Request path
+          example: "/api/profile"
+
+    ValidationError:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          description: HTTP status code
+          example: 400
+        message:
+          type: array
+          items:
+            type: string
+          description: List of validation error messages
+          example: ["email must be an email", "password must be longer than or equal to 8 characters"]
+        error:
+          type: string
+          description: Error type
+          example: "Bad Request"
+
+tags:
+  - name: health
+    description: System health check endpoints
+  - name: auth
+    description: Authentication and user management
+  - name: profile
+    description: User profile and preferences management

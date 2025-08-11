@@ -1,0 +1,1494 @@
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native"]
+  engineType = "library"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                                            String                  @id @default(cuid())
+  email                                         String                  @unique
+  phone                                         String?                 @unique
+  firstName                                     String
+  lastName                                      String
+  dateOfBirth                                   DateTime
+  gender                                        Gender
+  profilePicture                                String?
+  isVerified                                    Boolean                 @default(false)
+  verificationStatus                            VerificationStatus      @default(PENDING)
+  relationshipStatus                            RelationshipStatus      @default(SINGLE)
+  preferredLanguage                             String?                 @default("en")
+  currentPhase                                  String?                 @default("single")
+  password                                      String
+  resetToken                                    String?
+  resetTokenExpiry                              DateTime?
+  verificationToken                             String?
+  verificationTokenExpiry                       DateTime?
+  loginAttempts                                 Int                     @default(0)
+  lockoutUntil                                  DateTime?
+  createdAt                                     DateTime                @default(now())
+  updatedAt                                     DateTime                @updatedAt
+  article_bookmarks                             article_bookmarks[]
+  article_read_history                          article_read_history[]
+  date_feedbacks                                date_feedbacks[]
+  date_interests                                date_interests[]
+  date_payments                                 date_payments[]
+  date_requests_date_requests_fromUserIdTousers date_requests[]         @relation("date_requests_fromUserIdTousers")
+  date_requests_date_requests_toUserIdTousers   date_requests[]         @relation("date_requests_toUserIdTousers")
+  date_schedules                                date_schedules[]
+  delivered_dates                               delivered_dates[]
+  matches_matches_fromUserIdTousers             matches[]               @relation("matches_fromUserIdTousers")
+  matches_matches_toUserIdTousers               matches[]               @relation("matches_toUserIdTousers")
+  notifications                                 Notification[]
+  photos                                        Photo[]
+  relationships_relationships_user1IdTousers    relationships[]         @relation("relationships_user1IdTousers")
+  relationships_relationships_user2IdTousers    relationships[]         @relation("relationships_user2IdTousers")
+  user_personality_profiles                     UserPersonalityProfile?
+  preferences                                   UserPreferences?
+  profile                                       UserProfile?
+  user_quiz_responses                           UserQuizResponse[]
+
+  // Safety and Security Relations
+  safety_reports_made                           SafetyReport[]              @relation("ReporterUser")
+  safety_reports_received                       SafetyReport[]              @relation("ReportedUser")
+  blocked_users                                 UserBlock[]                 @relation("BlockingUser")
+  blocked_by_users                              UserBlock[]                 @relation("BlockedUser")
+  verification_requests                         VerificationRequest[]
+  safety_check_ins                              SafetyCheckIn[]
+  emergency_contacts                            EmergencyContact[]
+
+  @@map("users")
+}
+
+model UserProfile {
+  id              String           @id @default(cuid())
+  userId          String           @unique
+  bio             String?
+  height          Int?
+  education       String?
+  occupation      String?
+  city            String
+  country         String
+  latitude        Float?
+  longitude       Float?
+  interests       String[]
+  smoking         LifestyleChoice  @default(NEVER)
+  drinking        LifestyleChoice  @default(NEVER)
+  exercise        LifestyleChoice  @default(NEVER)
+  diet            DietType?
+  maritalStatus   MaritalStatus    @default(NEVER_MARRIED)
+  hasChildren     Boolean          @default(false)
+  wantsChildren   Boolean          @default(true)
+  familyValues    FamilyValues     @default(MIXED)
+  religion        String?
+  religiosity     Religiosity      @default(SOMEWHAT_RELIGIOUS)
+  prayerFrequency PrayerFrequency?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  ethnicity       String?
+  languages       String[]         @default([])
+  salaryMax       Int?
+  salaryMin       Int?
+  weight          Int?
+
+  // Enhanced Physical Attributes
+  bodyType        String?
+  skinTone        String?
+  eyeColor        String?
+  hairColor       String?
+  disabilities    String[]         @default([])
+  medicalConditions String[]       @default([])
+
+  // Personality & Astrology
+  personalityType String?
+  zodiacSign      String?
+  birthTime       String?
+  birthPlace      String?
+
+  // Language & Communication
+  motherTongue    String?
+  spokenLanguages String[]         @default([])
+
+  // Education & Career
+  educationLevel  String?
+  fieldOfStudy    String?
+  workExperience  Int?
+  annualIncome    Int?
+  workLocation    String?
+  workSchedule    String?
+  travelFrequency String?
+
+  // Interests & Lifestyle
+  hobbies         String[]         @default([])
+  sportsActivities String[]        @default([])
+  musicPreferences String[]        @default([])
+  movieGenres     String[]         @default([])
+  bookGenres      String[]         @default([])
+  cuisinePreferences String[]      @default([])
+  travelDestinations String[]      @default([])
+
+  // Values & Goals
+  lifeGoals       String[]         @default([])
+  values          String[]         @default([])
+  dealBreakers    String[]         @default([])
+
+  // Family Background
+  familySize      Int?
+  siblingCount    Int?
+  parentStatus    String?
+  familyType      String?
+  familyIncome    String?
+
+  // Living Situation
+  livingArrangement String?
+  housingType     String?
+  petPreference   String?
+
+  // Communication & Relationships
+  socialMediaUsage String?
+  communicationStyle String?
+  conflictResolution String?
+  loveLanguagePrimary String?
+  loveLanguageSecondary String?
+
+  // Marriage & Future
+  relationshipGoals String[]        @default([])
+  marriageTimeline String?
+  honeymoonPreferences String[]     @default([])
+  weddingStyle    String?
+  weddingBudget   String?
+  relocateWillingness String?
+
+  // Career & Finance
+  careerPriority  String?
+  workLifeBalance String?
+  retirementPlans String[]         @default([])
+  financialGoals  String[]         @default([])
+  investmentKnowledge String?
+  spendingHabits  String?
+  debtStatus      String?
+  insuranceCoverage String[]       @default([])
+  emergencyFund   Boolean          @default(false)
+
+  // Social & Political
+  politicalViews  String?
+  environmentalConcerns String[]    @default([])
+  volunteerWork   String[]         @default([])
+  communityInvolvement String?
+
+  // Cultural & Traditional
+  culturalBackground String?
+  traditionImportance String?
+  modernityAcceptance String?
+  genderRoles     String?
+
+  // Parenting & Children
+  parentingStyle  String?
+  childEducationPreferences String[] @default([])
+  extracurricularActivities String[] @default([])
+
+  // Travel & Adventure
+  vacationFrequency String?
+  vacationBudget  String?
+  adventureLevel  String?
+  comfortZone     String?
+
+  // Health & Wellness
+  stressManagement String[]        @default([])
+  mentalHealthAwareness String?
+  therapyOpenness String?
+  selfCareRoutine String[]         @default([])
+  fitnessLevel    String?
+  workoutPreferences String[]      @default([])
+  nutritionAwareness String?
+  sleepSchedule   String?
+  morningRoutine  String[]         @default([])
+  eveningRoutine  String[]         @default([])
+
+  // Social Life
+  weekendActivities String[]       @default([])
+  socialCircle    String?
+  friendshipStyle String?
+  networkingImportance String?
+  privacyLevel    String?
+  socialEvents    String[]         @default([])
+  entertainingStyle String?
+
+  // Romance & Affection
+  giftGiving      String?
+  specialOccasions String[]        @default([])
+  anniversaryImportance String?
+  surpriseAppreciation String?
+  romanticGestures String[]        @default([])
+  intimacyImportance String?
+  physicalAffection String?
+  emotionalSupport String?
+  intellectualConnection String?
+  spiritualConnection String?
+
+  // Personality Traits
+  humorStyle      String[]         @default([])
+  conversationTopics String[]      @default([])
+  debateComfort   String?
+  opinionSharing  String?
+  decisionMaking  String?
+  problemSolving  String?
+  adaptability    String?
+  changeAcceptance String?
+  riskTolerance   String?
+  spontaneity     String?
+  planningStyle   String?
+  timeManagement  String?
+  punctuality     String?
+  organizationLevel String?
+  cleanlinessLevel String?
+
+  // Domestic Skills
+  cookingSkills   String?
+  householdChores String[]         @default([])
+  maintenanceSkills String[]       @default([])
+
+  // Technology & Digital
+  technologyComfort String?
+  socialMediaPreferences String[]  @default([])
+  onlinePrivacy   String?
+  digitalDetox    String?
+
+  // Learning & Growth
+  learningStyle   String?
+  curiosityLevel  String?
+  skillDevelopment String[]        @default([])
+  careerAmbitions String[]         @default([])
+  leadershipStyle String?
+  teamworkPreference String?
+  competitiveness String?
+  achievementOrientation String?
+  recognitionImportance String?
+  workMotivation  String[]         @default([])
+
+  // Life Philosophy
+  retirementAge   Int?
+  legacyGoals     String[]         @default([])
+  philanthropyInterest String[]    @default([])
+  mentoringWillingness String?
+  knowledgeSharing String?
+  wisdomSeeking   String?
+  lifePhilosophy  String?
+  meaningOfLife   String?
+  happinessDefinition String?
+  successDefinition String?
+  personalMotto   String?
+  inspirationalQuotes String[]     @default([])
+  roleModels      String[]         @default([])
+
+  // Life Experiences
+  lifeChangingEvents String[]      @default([])
+  proudestAchievements String[]    @default([])
+  biggestChallenges String[]       @default([])
+  lessonsLearned  String[]         @default([])
+  futureAspirations String[]       @default([])
+  bucketList      String[]         @default([])
+  fearsToConcquer String[]         @default([])
+
+  // Personal Development
+  personalGrowthAreas String[]     @default([])
+  strengthsToLeverage String[]     @default([])
+  supportSystemNeeds String[]      @default([])
+  mentorshipNeeds String[]         @default([])
+  skillsToLearn   String[]         @default([])
+  habitsToChange  String[]         @default([])
+
+  // Future Planning
+  goalsFor1Year   String[]         @default([])
+  goalsFor5Years  String[]         @default([])
+  goalsFor10Years String[]         @default([])
+  retirementVision String[]        @default([])
+  elderCareThoughts String[]       @default([])
+  generationalWealth String?
+
+  // Cultural & Family Traditions
+  familyTraditions String[]        @default([])
+  culturalCelebrations String[]    @default([])
+  holidayImportance String[]       @default([])
+  giftTraditions  String[]         @default([])
+  familyReunions  String?
+  ancestryInterest String?
+  heritagePreservation String[]    @default([])
+  languagePreservation String[]    @default([])
+  culturalPassing String[]         @default([])
+  identityImportance String?
+  belongingSense  String?
+  communityRoots  String?
+
+  // Environment & Location
+  neighborhoodPreference String?
+  cityVsCountry   String?
+  climatePreference String?
+  seasonalPreferences String[]     @default([])
+  outdoorActivities String[]       @default([])
+  indoorActivities String[]        @default([])
+  weatherSensitivity String?
+
+  // Safety & Security
+  naturalDisasterPreparedness String?
+  emergencyPlanning String[]       @default([])
+  safetyPriorities String[]        @default([])
+  securityMeasures String[]        @default([])
+  riskAssessment  String?
+  insurancePhilosophy String?
+
+  // Health & Medical
+  healthcarePreferences String[]   @default([])
+  preventiveCare  String?
+  alternativeMedicine String[]     @default([])
+  fitnessGoals    String[]         @default([])
+  nutritionGoals  String[]         @default([])
+  wellnessRoutines String[]        @default([])
+
+  // Spirituality & Mindfulness
+  mindfulnessPractices String[]    @default([])
+  meditationExperience String?
+  spiritualPractices String[]      @default([])
+  religiousObservance String[]     @default([])
+  faithImportance String?
+  prayerLife      String?
+  scripturalStudy String?
+  communityWorship String?
+  serviceOpportunities String[]    @default([])
+  missionWork     String[]         @default([])
+  faithSharing    String?
+  religiousTolerance String?
+  interfaithComfort String?
+  spiritualGrowth String[]         @default([])
+
+  // Values & Ethics
+  moralValues     String[]         @default([])
+  ethicalStandards String[]        @default([])
+  integrityImportance String?
+  honestyLevel    String?
+  trustBuilding   String[]         @default([])
+  loyaltyExpectations String[]     @default([])
+  commitmentLevel String?
+  reliabilityRating String?
+  accountabilityAcceptance String?
+  responsibilitySharing String?
+  maturityLevel   String?
+
+  // Emotional Intelligence
+  emotionalIntelligence String?
+  selfAwareness   String?
+  empathyLevel    String?
+  compassionShowing String[]       @default([])
+  kindnessExpressions String[]     @default([])
+  generosityLevel String?
+  givingStyle     String[]         @default([])
+  receivingComfort String?
+  gratitudeExpression String[]     @default([])
+  appreciationShowing String[]     @default([])
+  encouragementGiving String[]     @default([])
+  supportOffering String[]         @default([])
+  comfortProviding String[]        @default([])
+
+  // Celebration & Milestones
+  celebrationStyle String[]        @default([])
+  milestoneMarking String[]        @default([])
+  achievementSharing String?
+  successCelebration String[]      @default([])
+  failureHandling String[]         @default([])
+  disappointmentCoping String[]    @default([])
+  griefProcessing String[]         @default([])
+  lossSupport     String[]         @default([])
+  healingApproaches String[]       @default([])
+  recoveryMethods String[]         @default([])
+  resilienceBuilding String[]      @default([])
+  strengthFinding String[]         @default([])
+  hopeMaintenence String[]         @default([])
+  optimismLevel   String?
+  positivitySources String[]       @default([])
+  motivationFactors String[]       @default([])
+  inspirationSources String[]      @default([])
+  energySources   String[]         @default([])
+  renewalMethods  String[]         @default([])
+  restorativePractices String[]    @default([])
+  balanceStrategies String[]       @default([])
+  harmonyCreation String[]         @default([])
+  peaceBuilding   String[]         @default([])
+  conflictAvoidance String[]       @default([])
+  tensionRelief   String[]         @default([])
+  stressReduction String[]         @default([])
+  anxietyManagement String[]       @default([])
+  calmingTechniques String[]       @default([])
+  relaxationMethods String[]       @default([])
+  comfortSeeking  String[]         @default([])
+  securityBuilding String[]        @default([])
+  stabilityCreation String[]       @default([])
+  consistencyValue String?
+  routineImportance String?
+  structureNeeds  String[]         @default([])
+  flexibilityLevel String?
+  adaptabilitySkills String[]      @default([])
+  changeManagement String[]        @default([])
+  transitionHandling String[]      @default([])
+  uncertaintyTolerance String?
+  ambiguityComfort String?
+  clarityNeed     String?
+  understandingSeeking String[]    @default([])
+  knowledgePursuit String[]        @default([])
+  wisdomGathering String[]         @default([])
+  insightDevelopment String[]      @default([])
+  perspectiveGaining String[]      @default([])
+  viewpointSharing String?
+  opinionRespect  String?
+  diversityAppreciation String[]   @default([])
+  inclusionPractices String[]      @default([])
+  acceptanceLevel String?
+  toleranceShowing String[]        @default([])
+  understandingOffering String[]   @default([])
+  patienceLevel   String?
+  forgivenessCapacity String?
+  reconciliationSkills String[]   @default([])
+  healingFacilitation String[]     @default([])
+  restorationMethods String[]      @default([])
+  renewalProcesses String[]        @default([])
+  transformationOpenness String?
+  growthMindset   String?
+  learningEagerness String?
+  improvementFocus String[]        @default([])
+  excellencePursuit String[]       @default([])
+  masteryGoals    String[]         @default([])
+  skillRefinement String[]         @default([])
+  talentDevelopment String[]       @default([])
+  giftSharing     String[]         @default([])
+  abilityUtilization String[]      @default([])
+  strengthMaximization String[]    @default([])
+  potentialRealization String[]    @default([])
+  purposeFulfillment String[]      @default([])
+  missionAlignment String?
+  visionClarity   String?
+  directionSense  String?
+  pathFinding     String[]         @default([])
+  journeyAppreciation String?
+  destinationFocus String?
+  milestoneRecognition String[]    @default([])
+  progressTracking String[]        @default([])
+  achievementMeasurement String[]  @default([])
+  successMetrics  String[]         @default([])
+  goalSetting     String[]         @default([])
+  planningApproach String[]        @default([])
+  executionStyle  String[]         @default([])
+  implementationMethods String[]   @default([])
+  actionTaking    String[]         @default([])
+  initiativeShowing String?
+  leadershipReadiness String?
+  followshipSkills String[]        @default([])
+  collaborationStyle String[]      @default([])
+  partnershipApproach String[]     @default([])
+  relationshipBuilding String[]    @default([])
+  connectionCreation String[]      @default([])
+  bondStrengthening String[]       @default([])
+  intimacyDevelopment String[]     @default([])
+  closenessBuilding String[]       @default([])
+  attachmentStyle String?
+  securityProviding String[]       @default([])
+  safetyCreation  String[]         @default([])
+  protectionOffering String[]      @default([])
+  caregiving      String[]         @default([])
+  nurturingStyle  String[]         @default([])
+  supportProviding String[]        @default([])
+  encouragementOffering String[]   @default([])
+  motivationSharing String[]       @default([])
+  inspirationGiving String[]       @default([])
+  upliftingMethods String[]        @default([])
+  empowermentApproach String[]     @default([])
+  strengtheningSystems String[]    @default([])
+  buildingTechniques String[]      @default([])
+  developmentMethods String[]      @default([])
+  growthFacilitation String[]      @default([])
+  flourishingSupport String[]      @default([])
+  thrivingEnablement String[]      @default([])
+  successEnabling String[]         @default([])
+  achievementSupport String[]      @default([])
+  accomplishmentCelebration String[] @default([])
+  victorySharing  String[]         @default([])
+  triumphRecognition String[]      @default([])
+  winningAttitude String?
+  championMindset String?
+  excellenceCommitment String?
+  qualityFocus    String?
+  standardsSetting String[]        @default([])
+  expectationsManagement String[]  @default([])
+  boundariesEstablishment String[] @default([])
+  limitsRespecting String[]        @default([])
+  guidelinesFollowing String[]     @default([])
+  rulesAdherence  String[]         @default([])
+  principlesUpholding String[]     @default([])
+  valuesLiving    String[]         @default([])
+  beliefsExpressing String[]       @default([])
+  convictionsShowing String[]      @default([])
+  faithDemonstrating String[]      @default([])
+  hopeSharing     String[]         @default([])
+  loveExpressing  String[]         @default([])
+  joyShowing      String[]         @default([])
+  peaceCreating   String[]         @default([])
+  happinessBuilding String[]       @default([])
+  fulfillmentSeeking String[]      @default([])
+  satisfactionPursuing String[]    @default([])
+  contentmentFinding String[]      @default([])
+  gratitudePracticing String[]     @default([])
+  thankfulnessExpressing String[]  @default([])
+  blessingRecognition String[]     @default([])
+  giftAcknowledgment String[]      @default([])
+  favorAppreciation String[]       @default([])
+  kindnessRecognition String[]     @default([])
+  generosityAcknowledgment String[] @default([])
+  loveReceiving   String[]         @default([])
+  careAccepting   String[]         @default([])
+  supportWelcoming String[]        @default([])
+  helpReceiving   String[]         @default([])
+  assistanceAccepting String[]     @default([])
+  guidanceWelcoming String[]       @default([])
+  adviceSeeking   String[]         @default([])
+  counselAccepting String[]        @default([])
+  mentorshipWelcoming String[]     @default([])
+  teachingReceiving String[]       @default([])
+  learningEmbracing String[]       @default([])
+  growthWelcoming String[]         @default([])
+  changeEmbracing String[]         @default([])
+  transformationAccepting String[] @default([])
+  evolutionWelcoming String[]      @default([])
+  developmentEmbracing String[]    @default([])
+  improvementSeeking String[]      @default([])
+  enhancementPursuing String[]     @default([])
+  refinementWelcoming String[]     @default([])
+  perfectionSeeking String[]       @default([])
+  excellencePursuing String[]      @default([])
+  masteryStriving String[]         @default([])
+  expertiseDeveloping String[]     @default([])
+  skillBuilding   String[]         @default([])
+  abilityEnhancing String[]        @default([])
+  talentCultivating String[]       @default([])
+  giftDeveloping  String[]         @default([])
+  strengthBuilding String[]        @default([])
+  capacityExpanding String[]       @default([])
+  potentialRealizing String[]      @default([])
+  possibilityExploring String[]    @default([])
+  opportunitySeizing String[]      @default([])
+  chanceEmbracing String[]         @default([])
+  momentCherishing String[]        @default([])
+  experienceValuing String[]       @default([])
+  memoryCreating  String[]         @default([])
+  legacyBuilding  String[]         @default([])
+  impactMaking    String[]         @default([])
+  differenceCreating String[]      @default([])
+  contributionMaking String[]      @default([])
+  serviceOffering String[]         @default([])
+  givingBack      String[]         @default([])
+  sharingWealth   String[]         @default([])
+  blessingOthers  String[]         @default([])
+  helpingCommunity String[]        @default([])
+  servingSociety  String[]         @default([])
+  improvingWorld  String[]         @default([])
+  changingLives   String[]         @default([])
+  touchingHearts  String[]         @default([])
+  inspiringSouls  String[]         @default([])
+  upliftingSpirits String[]        @default([])
+  encouragingOthers String[]       @default([])
+  motivatingPeople String[]        @default([])
+  empoweringIndividuals String[]   @default([])
+  strengtheningCommunities String[] @default([])
+  buildingBridges String[]         @default([])
+  creatingConnections String[]     @default([])
+  fosteringRelationships String[]  @default([])
+  nurturingBonds  String[]         @default([])
+  cultivatingLove String[]         @default([])
+  growingTogether String[]         @default([])
+  flourishingPartnership String[]  @default([])
+  thrivingRelationship String[]    @default([])
+  lastUpdated     DateTime?        @default(now())
+
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
+}
+
+model UserPreferences {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  minAge       Int      @default(18)
+  maxAge       Int      @default(80)
+  minHeight    Int?
+  maxHeight    Int?
+  maxDistance  Int      @default(50)
+  education    String[]
+  occupation   String[]
+  interests    String[]
+  dealBreakers String[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_preferences")
+}
+
+model QuizCategory {
+  id             String         @id @default(cuid())
+  key            String         @unique
+  name           String
+  description    String?
+  order_index    Int            @default(0)
+  is_active      Boolean        @default(true)
+  created_at     DateTime       @default(now())
+  quiz_questions QuizQuestion[]
+
+  @@map("quiz_categories")
+}
+
+model QuizQuestion {
+  id                  String             @id @default(cuid())
+  category_id         String
+  question_key        String             @unique
+  question_text       String
+  question_type       String
+  trait               String?
+  reverse_scored      Boolean            @default(false)
+  order_index         Int                @default(0)
+  is_active           Boolean            @default(true)
+  created_at          DateTime           @default(now())
+  quiz_options        QuizOption[]
+  quiz_categories     QuizCategory       @relation(fields: [category_id], references: [id], onDelete: Cascade)
+  user_quiz_responses UserQuizResponse[]
+
+  @@map("quiz_questions")
+}
+
+model QuizOption {
+  id                  String             @id @default(cuid())
+  question_id         String
+  option_key          String
+  option_text         String
+  score_value         Int?
+  order_index         Int                @default(0)
+  created_at          DateTime           @default(now())
+  quiz_questions      QuizQuestion       @relation(fields: [question_id], references: [id], onDelete: Cascade)
+  user_quiz_responses UserQuizResponse[]
+
+  @@map("quiz_options")
+}
+
+model UserQuizResponse {
+  id                 String       @id @default(cuid())
+  user_id            String
+  question_id        String
+  selected_option_id String
+  score              Int?
+  completed_at       DateTime     @default(now())
+  quiz_questions     QuizQuestion @relation(fields: [question_id], references: [id], onDelete: Cascade)
+  quiz_options       QuizOption   @relation(fields: [selected_option_id], references: [id], onDelete: Cascade)
+  users              User         @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, question_id])
+  @@map("user_quiz_responses")
+}
+
+model UserPersonalityProfile {
+  id                      String    @id @default(cuid())
+  user_id                 String    @unique
+  openness_score          Int?
+  conscientiousness_score Int?
+  extraversion_score      Int?
+  agreeableness_score     Int?
+  neuroticism_score       Int?
+  primary_love_language   String?
+  secondary_love_language String?
+  attachment_style        String?
+  lifestyle_preferences   Json?
+  matching_preferences    Json?
+  completed_at            DateTime?
+  updated_at              DateTime  @default(now())
+  users                   User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("user_personality_profiles")
+}
+
+model Photo {
+  id         String   @id @default(cuid())
+  userId     String
+  url        String
+  isPrimary  Boolean  @default(false)
+  order      Int      @default(0)
+  uploadedAt DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("photos")
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  title     String
+  message   String
+  data      Json?
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+model SystemSetting {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       Json
+  description String?
+  category    String   @default("general")
+  isPublic    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("system_settings")
+}
+
+model app_phase_translations {
+  id          String     @id
+  phaseId     String
+  language    String
+  title       String
+  description String?
+  icon        String?
+  app_phases  app_phases @relation(fields: [phaseId], references: [id], onDelete: Cascade)
+
+  @@unique([phaseId, language])
+}
+
+model app_phases {
+  id                     String                   @id
+  key                    String                   @unique
+  isActive               Boolean                  @default(true)
+  order                  Int                      @default(0)
+  createdAt              DateTime                 @default(now())
+  app_phase_translations app_phase_translations[]
+}
+
+model article_bookmarks {
+  id        String   @id
+  userId    String
+  articleId String
+  createdAt DateTime @default(now())
+  articles  articles @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  users     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, articleId])
+}
+
+model article_categories {
+  id         String     @id
+  articleId  String
+  categoryId String
+  createdAt  DateTime   @default(now())
+  articles   articles   @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  categories categories @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([articleId, categoryId])
+}
+
+model article_read_history {
+  id             String   @id
+  userId         String
+  articleId      String
+  readAt         DateTime @default(now())
+  readDuration   Int?
+  readPercentage Float?
+  articles       articles @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  users          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, articleId])
+}
+
+model article_tags {
+  id        String   @id
+  articleId String
+  tagId     String
+  createdAt DateTime @default(now())
+  articles  articles @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  tags      tags     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([articleId, tagId])
+}
+
+model article_translations {
+  id              String   @id
+  articleId       String
+  language        String
+  title           String
+  subtitle        String?
+  content         String
+  excerpt         String?
+  author          String
+  readTime        String
+  icon            String?
+  metaTitle       String?
+  metaDescription String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime
+  articles        articles @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@unique([articleId, language])
+}
+
+model articles {
+  id                   String                 @id
+  slug                 String                 @unique
+  status               ArticleStatus          @default(DRAFT)
+  featured             Boolean                @default(false)
+  viewCount            Int                    @default(0)
+  likeCount            Int                    @default(0)
+  publishedAt          DateTime?
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime
+  article_bookmarks    article_bookmarks[]
+  article_categories   article_categories[]
+  article_read_history article_read_history[]
+  article_tags         article_tags[]
+  article_translations article_translations[]
+}
+
+model categories {
+  id                    String                  @id
+  slug                  String                  @unique
+  icon                  String?
+  color                 String?
+  order                 Int                     @default(0)
+  isActive              Boolean                 @default(true)
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime
+  article_categories    article_categories[]
+  category_translations category_translations[]
+}
+
+model category_translations {
+  id          String     @id
+  categoryId  String
+  language    String
+  name        String
+  description String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime
+  categories  categories @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([categoryId, language])
+}
+
+model date_activities {
+  id                         String                       @id
+  key                        String                       @unique
+  duration                   Int
+  order                      Int                          @default(0)
+  isActive                   Boolean                      @default(true)
+  createdAt                  DateTime                     @default(now())
+  date_activity_translations date_activity_translations[]
+}
+
+model date_activity_translations {
+  id              String          @id
+  activityId      String
+  language        String
+  name            String
+  description     String
+  instructions    Json?
+  date_activities date_activities @relation(fields: [activityId], references: [id], onDelete: Cascade)
+
+  @@unique([activityId, language])
+}
+
+model date_experiences {
+  id                String           @id
+  deliveredDateId   String           @unique
+  status            ExperienceStatus @default(SCHEDULED)
+  checkInTime       DateTime?
+  startTime         DateTime?
+  endTime           DateTime?
+  iceBreakers       Json?
+  activities        Json?
+  conversationTimer Int?
+  specialNotes      String?
+  emergencyContact  String?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime
+  delivered_dates   delivered_dates  @relation(fields: [deliveredDateId], references: [id], onDelete: Cascade)
+}
+
+model date_feedbacks {
+  id             String        @id
+  dateRequestId  String
+  userId         String
+  rating         Int
+  chemistry      Int
+  wouldMeetAgain Boolean
+  feedback       String?
+  createdAt      DateTime      @default(now())
+  date_requests  date_requests @relation(fields: [dateRequestId], references: [id], onDelete: Cascade)
+  users          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([dateRequestId, userId])
+}
+
+model date_interests {
+  id              String          @id
+  deliveredDateId String
+  userId          String
+  isInterested    Boolean
+  response        String?
+  respondedAt     DateTime        @default(now())
+  delivered_dates delivered_dates @relation(fields: [deliveredDateId], references: [id], onDelete: Cascade)
+  users           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([deliveredDateId, userId])
+}
+
+model date_payments {
+  id              String          @id
+  deliveredDateId String
+  userId          String
+  amount          Float
+  currency        String          @default("USD")
+  paymentIntentId String?
+  status          PaymentStatus   @default(PENDING)
+  paidAt          DateTime?
+  refundedAt      DateTime?
+  createdAt       DateTime        @default(now())
+  delivered_dates delivered_dates @relation(fields: [deliveredDateId], references: [id], onDelete: Cascade)
+  users           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([deliveredDateId, userId])
+}
+
+model date_requests {
+  id                                    String           @id
+  fromUserId                            String
+  toUserId                              String
+  proposedDate                          DateTime
+  venue                                 String?
+  message                               String?
+  status                                DateStatus       @default(PENDING)
+  createdAt                             DateTime         @default(now())
+  updatedAt                             DateTime
+  date_feedbacks                        date_feedbacks[]
+  users_date_requests_fromUserIdTousers User             @relation("date_requests_fromUserIdTousers", fields: [fromUserId], references: [id], onDelete: Cascade)
+  users_date_requests_toUserIdTousers   User             @relation("date_requests_toUserIdTousers", fields: [toUserId], references: [id], onDelete: Cascade)
+}
+
+model date_schedules {
+  id              String          @id
+  deliveredDateId String
+  userId          String
+  preferredDates  DateTime[]
+  availability    Json
+  finalDateTime   DateTime?
+  venue           String?
+  venueAddress    String?
+  venueType       VenueType?
+  estimatedCost   Float?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime
+  venueId         String?
+  delivered_dates delivered_dates @relation(fields: [deliveredDateId], references: [id], onDelete: Cascade)
+  users           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  venues          venues?         @relation(fields: [venueId], references: [id])
+
+  @@unique([deliveredDateId, userId])
+}
+
+model delivered_dates {
+  id                 String              @id
+  userId             String
+  partnerUserId      String
+  status             DeliveredDateStatus @default(PENDING)
+  compatibilityScore Float
+  matchReason        String?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime
+  expiresAt          DateTime
+  date_experiences   date_experiences?
+  date_interests     date_interests[]
+  date_payments      date_payments[]
+  date_schedules     date_schedules[]
+  users              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model icebreaker_categories {
+  id                               String                             @id
+  key                              String                             @unique
+  order                            Int                                @default(0)
+  isActive                         Boolean                            @default(true)
+  createdAt                        DateTime                           @default(now())
+  icebreaker_category_translations icebreaker_category_translations[]
+  icebreaker_questions             icebreaker_questions[]
+}
+
+model icebreaker_category_translations {
+  id                    String                @id
+  categoryId            String
+  language              String
+  title                 String
+  icebreaker_categories icebreaker_categories @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([categoryId, language])
+}
+
+model icebreaker_question_translations {
+  id                   String               @id
+  questionId           String
+  language             String
+  text                 String
+  icebreaker_questions icebreaker_questions @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([questionId, language])
+}
+
+model icebreaker_questions {
+  id                               String                             @id
+  categoryId                       String
+  order                            Int                                @default(0)
+  isActive                         Boolean                            @default(true)
+  createdAt                        DateTime                           @default(now())
+  icebreaker_question_translations icebreaker_question_translations[]
+  icebreaker_categories            icebreaker_categories              @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+}
+
+model languages {
+  id         String   @id
+  code       String   @unique
+  name       String
+  nativeName String
+  flag       String?
+  isActive   Boolean  @default(true)
+  isDefault  Boolean  @default(false)
+  direction  String   @default("ltr")
+  createdAt  DateTime @default(now())
+}
+
+model matches {
+  id                              String      @id
+  fromUserId                      String
+  toUserId                        String
+  compatibilityScore              Float
+  status                          MatchStatus @default(PENDING)
+  conciergeNotes                  String?
+  matchedAt                       DateTime    @default(now())
+  updatedAt                       DateTime
+  users_matches_fromUserIdTousers User        @relation("matches_fromUserIdTousers", fields: [fromUserId], references: [id], onDelete: Cascade)
+  users_matches_toUserIdTousers   User        @relation("matches_toUserIdTousers", fields: [toUserId], references: [id], onDelete: Cascade)
+
+  @@unique([fromUserId, toUserId])
+}
+
+model relationships {
+  id                                 String            @id
+  user1Id                            String
+  user2Id                            String
+  status                             RelationshipPhase @default(MATCHED)
+  startDate                          DateTime          @default(now())
+  engagementDate                     DateTime?
+  weddingDate                        DateTime?
+  createdAt                          DateTime          @default(now())
+  updatedAt                          DateTime
+  users_relationships_user1IdTousers User              @relation("relationships_user1IdTousers", fields: [user1Id], references: [id], onDelete: Cascade)
+  users_relationships_user2IdTousers User              @relation("relationships_user2IdTousers", fields: [user2Id], references: [id], onDelete: Cascade)
+
+  @@unique([user1Id, user2Id])
+}
+
+model tag_translations {
+  id        String   @id
+  tagId     String
+  language  String
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+  tags      tags     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([tagId, language])
+}
+
+model tags {
+  id               String             @id
+  slug             String             @unique
+  color            String?
+  isActive         Boolean            @default(true)
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime
+  article_tags     article_tags[]
+  tag_translations tag_translations[]
+}
+
+model venues {
+  id             String           @id
+  name           String
+  address        String
+  city           String
+  country        String
+  latitude       Float?
+  longitude      Float?
+  type           VenueType
+  priceRange     PriceRange       @default(MODERATE)
+  rating         Float?           @default(4.0)
+  capacity       Int?
+  amenities      Json?
+  openingHours   Json?
+  contactInfo    Json?
+  images         String[]         @default([])
+  isActive       Boolean          @default(true)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime
+  date_schedules date_schedules[]
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum RelationshipStatus {
+  SINGLE
+  ENGAGED
+  MARRIED
+}
+
+enum LifestyleChoice {
+  NEVER
+  OCCASIONALLY
+  REGULARLY
+}
+
+enum DietType {
+  VEGETARIAN
+  VEGAN
+  HALAL
+  KOSHER
+  NONE
+}
+
+enum FamilyValues {
+  TRADITIONAL
+  MODERN
+  MIXED
+}
+
+enum MaritalStatus {
+  NEVER_MARRIED
+  DIVORCED
+  WIDOWED
+}
+
+enum Religiosity {
+  VERY_RELIGIOUS
+  SOMEWHAT_RELIGIOUS
+  NOT_RELIGIOUS
+}
+
+enum NotificationType {
+  NEW_MATCH
+  DATE_REQUEST
+  DATE_ACCEPTED
+  DATE_REMINDER
+  PROFILE_VIEW
+  MESSAGE
+  SYSTEM
+  DATE_DELIVERED
+  DATE_INTEREST_RECEIVED
+  DATE_SCHEDULED
+  PAYMENT_REQUIRED
+  DATE_CONFIRMED
+  DATE_STARTING_SOON
+}
+
+enum PriceRange {
+  BUDGET
+  MODERATE
+  UPSCALE
+  LUXURY
+}
+
+enum DateStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  COMPLETED
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  REFUNDED
+  CANCELLED
+}
+
+enum ArticleStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+  DELETED
+}
+
+enum DeliveredDateStatus {
+  PENDING
+  MUTUAL_INTEREST
+  SCHEDULING
+  PAYMENT_PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  EXPIRED
+}
+
+enum ExperienceStatus {
+  SCHEDULED
+  READY_TO_START
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum MatchStatus {
+  PENDING
+  MUTUAL_INTEREST
+  DATE_SCHEDULED
+  REJECTED
+}
+
+enum PrayerFrequency {
+  DAILY
+  WEEKLY
+  OCCASIONALLY
+  NEVER
+}
+
+enum RelationshipPhase {
+  MATCHED
+  ENGAGED
+  MARRIED
+}
+
+enum VenueType {
+  RESTAURANT
+  CAFE
+  COFFEE_SHOP
+  BAR
+  LOUNGE
+  PARK
+  MUSEUM
+  ACTIVITY_CENTER
+  OTHER
+}
+
+// ============================================================================
+// SAFETY & SECURITY MODELS
+// ============================================================================
+
+model SafetyReport {
+  id                String              @id @default(cuid())
+  reporterId        String
+  reportedUserId    String
+  category          SafetyReportCategory
+  subcategory       String?
+  description       String
+  evidence          Json?               // URLs to evidence files/screenshots
+  severity          SafetyReportSeverity @default(MEDIUM)
+  status            SafetyReportStatus  @default(PENDING)
+  adminNotes        String?
+  resolution        String?
+  submittedAt       DateTime            @default(now())
+  reviewedAt        DateTime?
+  resolvedAt        DateTime?
+  metadata          Json?               // Additional context data
+
+  // Relations
+  reporter          User                @relation("ReporterUser", fields: [reporterId], references: [id], onDelete: Cascade)
+  reportedUser      User                @relation("ReportedUser", fields: [reportedUserId], references: [id], onDelete: Cascade)
+
+  @@map("safety_reports")
+  @@index([reporterId])
+  @@index([reportedUserId])
+  @@index([status])
+  @@index([category])
+  @@index([submittedAt])
+}
+
+model UserBlock {
+  id              String            @id @default(cuid())
+  blockingUserId  String
+  blockedUserId   String
+  reason          UserBlockReason?
+  description     String?
+  blockedAt       DateTime          @default(now())
+  expiresAt       DateTime?         // For temporary blocks
+  isActive        Boolean           @default(true)
+
+  // Relations
+  blockingUser    User              @relation("BlockingUser", fields: [blockingUserId], references: [id], onDelete: Cascade)
+  blockedUser     User              @relation("BlockedUser", fields: [blockedUserId], references: [id], onDelete: Cascade)
+
+  @@unique([blockingUserId, blockedUserId])
+  @@map("user_blocks")
+  @@index([blockingUserId])
+  @@index([blockedUserId])
+  @@index([isActive])
+}
+
+model VerificationRequest {
+  id                String                    @id @default(cuid())
+  userId            String
+  verificationType  VerificationType
+  status            VerificationRequestStatus @default(PENDING)
+  submittedAt       DateTime                  @default(now())
+  reviewedAt        DateTime?
+  completedAt       DateTime?
+  rejectedAt        DateTime?
+  rejectionReason   String?
+  adminNotes        String?
+
+  // Verification Data
+  documentType      String?                   // ID type: passport, license, etc.
+  documentImages    String[]                  @default([]) // URLs to document images
+  selfieImage       String?                   // URL to selfie verification image
+  livePhotoImage    String?                   // URL to live photo verification
+  metadata          Json?                     // Additional verification data
+
+  // Relations
+  user              User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("verification_requests")
+  @@index([userId])
+  @@index([status])
+  @@index([verificationType])
+  @@index([submittedAt])
+}
+
+model SafetyCheckIn {
+  id              String                @id @default(cuid())
+  userId          String
+  status          SafetyCheckInStatus   @default(SAFE)
+  location        Json?                 // { latitude, longitude, address }
+  plannedDuration Int?                  // Minutes
+  actualDuration  Int?                  // Minutes
+  checkInTime     DateTime              @default(now())
+  expectedEndTime DateTime?
+  actualEndTime   DateTime?
+  emergencyTriggered Boolean            @default(false)
+  emergencyTime   DateTime?
+  notes           String?
+  metadata        Json?                 // Additional context
+
+  // Relations
+  user            User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("safety_check_ins")
+  @@index([userId])
+  @@index([status])
+  @@index([checkInTime])
+  @@index([emergencyTriggered])
+}
+
+model EmergencyContact {
+  id              String            @id @default(cuid())
+  userId          String
+  name            String
+  phoneNumber     String
+  email           String?
+  relationship    String            // "friend", "family", "partner", etc.
+  isPrimary       Boolean           @default(false)
+  isActive        Boolean           @default(true)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  // Relations
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("emergency_contacts")
+  @@index([userId])
+  @@index([isPrimary])
+  @@index([isActive])
+}
+
+// ============================================================================
+// SAFETY & SECURITY ENUMS
+// ============================================================================
+
+enum SafetyReportCategory {
+  INAPPROPRIATE_PHOTOS
+  HARASSMENT
+  FAKE_PROFILE
+  INAPPROPRIATE_BEHAVIOR
+  SPAM
+  SCAM
+  VIOLENCE_THREATS
+  UNDERAGE
+  PRIVACY_VIOLATION
+  OTHER
+}
+
+enum SafetyReportSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum SafetyReportStatus {
+  PENDING
+  UNDER_REVIEW
+  RESOLVED
+  DISMISSED
+  ESCALATED
+}
+
+enum UserBlockReason {
+  HARASSMENT
+  INAPPROPRIATE_CONTENT
+  SPAM
+  FAKE_PROFILE
+  PERSONAL_CHOICE
+  SAFETY_CONCERN
+  OTHER
+}
+
+enum VerificationType {
+  PHOTO
+  IDENTITY
+  PHONE
+  EMAIL
+  LIVE_PHOTO
+  PREMIUM
+}
+
+enum VerificationRequestStatus {
+  PENDING
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  EXPIRED
+  CANCELLED
+}
+
+enum SafetyCheckInStatus {
+  SAFE
+  CHECKING_IN
+  OVERDUE
+  EMERGENCY
+  HELP_NEEDED
+  COMPLETED
+}
