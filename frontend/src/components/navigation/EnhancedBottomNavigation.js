@@ -3,7 +3,7 @@
  * Premium navigation with animations, haptic feedback, and sophisticated UX
  */
 
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { 
   View, 
   Text, 
@@ -47,20 +47,25 @@ const EnhancedBottomNavigation = ({
   notificationCount = 0,
 }) => {
   const { t } = useApp();
-  const [tabAnimations] = useState(() => 
-    new Map([
-      ['home', useRef(new Animated.Value(1)).current],
-      ['dates', useRef(new Animated.Value(1)).current],
-      ['articles', useRef(new Animated.Value(1)).current],
-      ['settings', useRef(new Animated.Value(1)).current],
-    ])
-  );
+  const homeAnimRef = useRef(new Animated.Value(1));
+  const datesAnimRef = useRef(new Animated.Value(1));
+  const articlesAnimRef = useRef(new Animated.Value(1));
+  const settingsAnimRef = useRef(new Animated.Value(1));
 
-  const [indicatorAnim] = useState(useRef(new Animated.Value(0)).current);
-  const [pulseAnim] = useState(useRef(new Animated.Value(1)).current);
+  const tabAnimations = React.useMemo(() => (
+    new Map([
+      ['home', homeAnimRef.current],
+      ['dates', datesAnimRef.current],
+      ['articles', articlesAnimRef.current],
+      ['settings', settingsAnimRef.current],
+    ])
+  ), []);
+
+  const indicatorAnim = useRef(new Animated.Value(0)).current;
+  const pulseAnim = useRef(new Animated.Value(1)).current;
 
   // Elite tab configuration with professional Ionicons
-  const tabs = [
+  const tabs = React.useMemo(() => ([
     {
       id: 'home',
       icon: 'home-outline',
@@ -95,7 +100,7 @@ const EnhancedBottomNavigation = ({
       color: COLORS.textSecondary,
       hasNotification: notificationCount > 0,
     },
-  ];
+  ]), [t, isProfileComplete, notificationCount]);
 
   useEffect(() => {
     // Animate indicator to active tab position
@@ -129,7 +134,7 @@ const EnhancedBottomNavigation = ({
 
       return () => pulseAnimation.stop();
     }
-  }, [activeTab, notificationCount]);
+  }, [activeTab, notificationCount, indicatorAnim, pulseAnim, tabs]);
 
   const handleTabPress = (tab) => {
     if (!tab.enabled) {
@@ -334,7 +339,7 @@ const EnhancedBottomNavigation = ({
       borderTopWidth: 1,
       borderTopColor: COLORS.border,
       shadowColor: COLORS.shadow,
-      shadowOffset: { width: 0, -4 },
+      shadowOffset: { width: 0, height: -4 },
       shadowOpacity: 0.1,
       shadowRadius: 12,
       elevation: 12,
