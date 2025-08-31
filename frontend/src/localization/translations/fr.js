@@ -80,22 +80,22 @@ export default {
     // Relationship phases
     phases: {
       single: {
-        title: 'Célibataire',
-        subtitle: 'Demander un rendez-vous',
-        description: 'Demandez un rendez-vous et notre IA trouvera votre partenaire parfait, réservera un lieu incroyable et organisera tout pour vous',
-        icon: '💝',
+        title: 'Parcours des Célibataires',
+        subtitle: 'Découverte de soi et clarté',
+        description: 'Définissez vos valeurs et préférences pendant que nous préparons des présentations et expériences parfaites pour vous',
+        icon: '🌸',
       },
-      engagement: {
-        title: 'Fiançailles',
-        subtitle: 'Planifier ensemble',
-        description: 'Fiancés et planifiant votre avenir ensemble avec votre partenaire',
+      preparing: {
+        title: 'Préparer les Fiançailles',
+        subtitle: 'Planification et alignement',
+        description: 'Construisez une vision commune, alignez vos valeurs et planifiez des étapes significatives ensemble',
+        icon: '💕',
+      },
+      engaged: {
+        title: 'Avant les Fiançailles',
+        subtitle: 'Concentré et élégant',
+        description: 'Des expériences soignées et des décisions alors que vous avancez vers un avenir engagé',
         icon: '💍',
-      },
-      engagement_day_prep: {
-        title: 'Préparation du Jour de Fiançailles',
-        subtitle: 'Préparatifs Finaux',
-        description: 'Se préparer pour votre jour de fiançailles avec toutes les touches et préparatifs finaux',
-        icon: '✨',
       },
     },
   },

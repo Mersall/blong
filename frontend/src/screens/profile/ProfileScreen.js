@@ -21,10 +21,10 @@ const ProfileScreen = ({ userPreferences, user, onLogout, userPhase }) => {
     switch (userPhase) {
       case 'single':
         return { icon: '🌸', title: 'Singles Journey', color: COLORS.accent };
-      case 'engagement':
-        return { icon: '💍', title: 'Engagement Phase', color: COLORS.accent };
-      case 'engagement_day_prep':
-        return { icon: '✨', title: 'Engagement Day Prep', color: COLORS.accent };
+      case 'preparing':
+        return { icon: '💕', title: 'Preparing for Engagement', color: COLORS.accent };
+      case 'engaged':
+        return { icon: '💍', title: 'Before Engagement', color: COLORS.accent };
       default:
         return { icon: '🌸', title: 'Singles Journey', color: COLORS.accent };
     }

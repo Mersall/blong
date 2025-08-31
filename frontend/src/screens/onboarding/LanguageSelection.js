@@ -13,7 +13,6 @@ import {
   ScrollView,
   I18nManager,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useApp, useTheme, useRTL } from '../../contexts/AppContext';
 import { safeTranslate } from '../../localization/i18n';
 import { AppTransition } from '../../components/AppTransition';

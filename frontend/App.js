@@ -20,10 +20,11 @@ import { AppTransition } from './src/components/AppTransition';
 import { UniversalLoader, PremiumFullScreenLoader } from './src/components/loading';
 import { authService } from './src/services/authService';
 import { apiService } from './src/services/apiService';
-import { initializeNavigation } from './src/services/navigationService';
+import { initializeNavigation, navigationRef } from './src/services/navigationService';
 import networkManager from './src/services/networkManager';
 import NetworkStatusIndicator from './src/components/ui/NetworkStatusIndicator';
 import SuccessMessageManager from './src/components/ui/SuccessMessageManager';
+import { NavigationContainer } from '@react-navigation/native';
 
 
 
@@ -450,7 +451,7 @@ function AppContent() {
   // Main app with premium navigation (only if profile is complete)
   console.log('🏠 Showing MainNavigator - profile complete');
   return (
-    <>
+    <NavigationContainer ref={navigationRef}>
       <MainNavigator
         userPreferences={userPreferences}
         user={user}
@@ -472,7 +473,7 @@ function AppContent() {
         duration={successMessage?.duration}
         onClose={() => setSuccessMessage(null)}
       />
-    </>
+    </NavigationContainer>
   );
 }
 

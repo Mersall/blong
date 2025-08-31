@@ -80,22 +80,22 @@ export default {
     // Relationship phases
     phases: {
       single: {
-        title: 'Soltero',
-        subtitle: 'Solicitar una cita',
-        description: 'Solicita una cita y nuestra IA encontrará tu pareja perfecta, reservará un lugar increíble y organizará todo para ti',
-        icon: '💝',
+        title: 'Viaje de Solteros',
+        subtitle: 'Autodescubrimiento y claridad',
+        description: 'Define tus valores y preferencias mientras preparamos presentaciones y experiencias perfectas para ti',
+        icon: '🌸',
       },
-      engagement: {
-        title: 'Compromiso',
-        subtitle: 'Planificando juntos',
-        description: 'Comprometidos y planificando su futuro juntos con su pareja',
+      preparing: {
+        title: 'Preparación para el Compromiso',
+        subtitle: 'Planificación y alineación',
+        description: 'Construyan una visión compartida, alineen valores y planifiquen pasos significativos juntos',
+        icon: '💕',
+      },
+      engaged: {
+        title: 'Antes del Compromiso',
+        subtitle: 'Enfoque y elegancia',
+        description: 'Experiencias curadas y decisiones mientras avanzan hacia un futuro comprometido',
         icon: '💍',
-      },
-      engagement_day_prep: {
-        title: 'Preparación del Día de Compromiso',
-        subtitle: 'Preparativos Finales',
-        description: 'Preparándote para tu día de compromiso con todos los toques y preparativos finales',
-        icon: '✨',
       },
     },
   },

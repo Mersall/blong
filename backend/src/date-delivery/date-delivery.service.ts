@@ -1,14 +1,22 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { randomUUID } from 'crypto';
+import { AppConfigService } from '../config/config.service';
+import { PaymentProvider, StubPaymentProvider } from './payment-providers/payment.provider';
 
 @Injectable()
 export class DateDeliveryService {
-  constructor(private readonly prisma: PrismaService) {}
+  private paymentProvider: PaymentProvider;
+
+  constructor(private readonly prisma: PrismaService, private readonly config: AppConfigService) {
+    // In future, branch on this.config.paymentProvider for Stripe/Paymob
+    this.paymentProvider = new StubPaymentProvider();
+  }
 
   async getUserDates(userId: string, page: number = 1, limit: number = 10) {
     try {
       const skip = (page - 1) * limit;
-      
+
       // For now, return mock data since we don't have the full dating system implemented
       const mockDates = [
         {
@@ -267,4 +275,81 @@ export class DateDeliveryService {
       throw new BadRequestException('Failed to fetch dating statistics');
     }
   }
+
+  // Payment methods
+  async createPayment(userId: string, dto: { deliveredDateId: string; amount: number; currency?: string }) {
+    try {
+      const { deliveredDateId, amount, currency = 'USD' } = dto;
+
+      // Idempotent: if a pending/processing payment exists, return it
+      const existing = await this.prisma.date_payments.findFirst({
+        where: { deliveredDateId, userId, status: { in: ['PENDING', 'PROCESSING'] } },
+      });
+      if (existing) {
+        return {
+          success: true,
+          data: existing,
+          message: 'Payment already initiated',
+        };
+      }
+
+      // Create provider intent (stubbed)
+      const intent = await this.paymentProvider.createPaymentIntent({ amount, currency, metadata: { deliveredDateId, userId } });
+
+      const created = await this.prisma.date_payments.create({
+        data: {
+          id: randomUUID(),
+          deliveredDateId,
+          userId,
+          amount,
+          currency,
+          paymentIntentId: intent.providerPaymentId,
+          status: 'PENDING',
+        },
+      });
+
+      return { success: true, data: { ...created, clientSecret: intent.clientSecret }, message: 'Payment initiated successfully' };
+    } catch (error) {
+      console.error('Error creating payment:', error);
+      throw new BadRequestException('Failed to create payment');
+    }
+  }
+
+  async confirmPayment(userId: string, dto: { deliveredDateId: string; paymentIntentId?: string }) {
+    try {
+      const { deliveredDateId, paymentIntentId } = dto;
+
+      const payment = await this.prisma.date_payments.findUnique({
+        where: { deliveredDateId_userId: { deliveredDateId, userId } },
+      });
+
+      if (!payment) {
+        throw new NotFoundException('Payment not found');
+      }
+
+      if (payment.status === 'COMPLETED') {
+        return { success: true, data: payment, message: 'Payment already confirmed' };
+      }
+
+      // Confirm with provider (stubbed)
+      await this.paymentProvider.confirmPayment({ providerPaymentId: payment.paymentIntentId ?? paymentIntentId });
+
+      const updated = await this.prisma.date_payments.update({
+        where: { deliveredDateId_userId: { deliveredDateId, userId } },
+        data: {
+          status: 'COMPLETED',
+          paymentIntentId: paymentIntentId ?? payment.paymentIntentId,
+          paidAt: new Date(),
+        },
+      });
+
+      return { success: true, data: updated, message: 'Payment confirmed successfully' };
+    } catch (error) {
+      console.error('Error confirming payment:', error);
+      if (error instanceof NotFoundException) throw error;
+      throw new BadRequestException('Failed to confirm payment');
+    }
+  }
+
+
 }

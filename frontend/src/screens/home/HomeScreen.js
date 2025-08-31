@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, SafeAreaView, StatusBar } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { AppTransition } from '../../components/AppTransition';
 import { useTheme } from '../../contexts/AppContext';
 import DatePreparationCard from '../../components/dates/DatePreparationCard';
@@ -88,35 +87,35 @@ const HomeScreen = ({
     switch (currentUserPhase) {
       case 'single':
         return {
-          icon: '💝',
-          title: 'Ready for Dates',
-          subtitle: 'We deliver perfect dates for you',
+          icon: '🌸',
+          title: 'Singles Journey',
+          subtitle: 'Self-Discovery & Clarity',
           color: '#FF6B35',
-          lightColor: '#FFF5F0',
+          lightColor: '#FAFAFA',
         };
-      case 'engagement':
+      case 'preparing':
+        return {
+          icon: '💕',
+          title: 'Preparing for Engagement',
+          subtitle: 'Planning & Alignment',
+          color: '#FF6B35',
+          lightColor: '#FAFAFA',
+        };
+      case 'engaged':
         return {
           icon: '💍',
-          title: 'Plan Your Wedding',
-          subtitle: 'Create your dream wedding',
-          color: '#FFD700',
-          lightColor: '#FFF9E6',
-        };
-      case 'engagement_day_prep':
-        return {
-          icon: '✨',
-          title: 'Engagement Day',
-          subtitle: 'Perfect your special day',
+          title: 'Before Engagement',
+          subtitle: 'Focused & Elegant',
           color: '#FF6B35',
-          lightColor: '#FFF5F0',
+          lightColor: '#FAFAFA',
         };
       default:
         return {
-          icon: '💝',
+          icon: '🌸',
           title: 'Welcome',
           subtitle: 'Your journey begins here',
           color: '#FF6B35',
-          lightColor: '#FFF5F0',
+          lightColor: '#FAFAFA',
         };
     }
   };

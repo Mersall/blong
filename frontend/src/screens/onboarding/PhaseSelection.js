@@ -13,26 +13,23 @@ import {
   ScrollView,
   I18nManager,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useApp, useTheme, useRTL } from '../../contexts/AppContext';
 import { AppTransition } from '../../components/AppTransition';
-import styles, { PHASE_GRADIENTS } from './styles/PhaseSelectionStyles';
+import styles from './styles/PhaseSelectionStyles';
 
 const RELATIONSHIP_PHASES = [
   {
     id: 'single',
-    icon: '💝',
-    gradient: ['#FF6B35', '#FF8A65'],
+    icon: '🌸',
+    gradient: undefined,
   },
   {
-    id: 'engagement',
+    id: 'preparing',
+    icon: '💕',
+  },
+  {
+    id: 'engaged',
     icon: '💍',
-    gradient: ['#FFD700', '#FFA000'],
-  },
-  {
-    id: 'engagement_day_prep',
-    icon: '✨',
-    gradient: ['#FF6B35', '#FFD700'],
   },
 ];
 
@@ -143,19 +140,20 @@ const PhaseSelection = ({ onPhaseSelect }) => {
             }}
             onPress={() => handlePhaseSelect(phase)}
           >
-            <LinearGradient
-              colors={selectedPhase?.id === phase.id
-                ? phase.gradient
-                : [colors.surface, colors.background]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
+            <View
               style={{
+                backgroundColor: colors.surface,
                 padding: 24,
-                borderWidth: selectedPhase?.id === phase.id ? 0 : 1,
+                borderWidth: 1,
                 borderColor: colors.border,
-                borderRadius: 12,
+                borderRadius: 8,
+                shadowColor: colors.shadow,
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.05,
+                shadowRadius: 12,
+                elevation: 2,
               }}
-            >
+>
               <View style={{
                 flexDirection: rtlStyles.flexDirection,
                 alignItems: 'center',
@@ -229,7 +227,7 @@ const PhaseSelection = ({ onPhaseSelect }) => {
               }}>
                 {t(`onboarding.phases.${phase.id}.description`)}
               </Text>
-            </LinearGradient>
+            </View>
           </TouchableOpacity>
         ))}
       </ScrollView>

@@ -139,6 +139,21 @@ export class AppConfigService {
     return this.configService.get<string>('LOG_LEVEL') || 'info';
   }
 
+  // Payments
+  get paymentsEnabled(): boolean {
+    const v = this.configService.get<string>('PAYMENTS_ENABLED');
+    return v === 'true' || v === '1';
+  }
+  get paymentProvider(): string {
+    return this.configService.get<string>('PAYMENT_PROVIDER') || 'STUB';
+  }
+  get stripeSecretKey(): string | undefined {
+    return this.configService.get<string>('STRIPE_SECRET_KEY') || undefined;
+  }
+  get paymobApiKey(): string | undefined {
+    return this.configService.get<string>('PAYMOB_API_KEY') || undefined;
+  }
+
   get logFormat(): string {
     return this.configService.get<string>('LOG_FORMAT') || 'json';
   }

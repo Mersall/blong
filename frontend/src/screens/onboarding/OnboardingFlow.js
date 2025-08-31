@@ -6,10 +6,12 @@
 import React, { useState } from 'react';
 import { View } from 'react-native';
 import LanguageSelection from './LanguageSelection';
+import ThemeSelection from './ThemeSelection';
 import PhaseSelection from './PhaseSelection';
 
 const ONBOARDING_STEPS = {
   LANGUAGE: 'language',
+  THEME: 'theme',
   PHASE: 'phase',
   COMPLETE: 'complete',
 };
@@ -17,9 +19,15 @@ const ONBOARDING_STEPS = {
 const OnboardingFlow = ({ onComplete }) => {
   const [currentStep, setCurrentStep] = useState(ONBOARDING_STEPS.LANGUAGE);
   const [selectedLanguage, setSelectedLanguage] = useState(null);
+  const [selectedTheme, setSelectedTheme] = useState('light');
 
   const handleLanguageSelect = (language) => {
     setSelectedLanguage(language);
+    setCurrentStep(ONBOARDING_STEPS.THEME);
+  };
+
+  const handleThemeSelect = (theme) => {
+    setSelectedTheme(theme);
     setCurrentStep(ONBOARDING_STEPS.PHASE);
   };
 
@@ -48,7 +56,11 @@ const OnboardingFlow = ({ onComplete }) => {
             onPhaseSelect={handlePhaseSelect}
           />
         );
-      
+      case ONBOARDING_STEPS.THEME:
+        return (
+          <ThemeSelection onThemeSelect={handleThemeSelect} />
+        );
+
       default:
         return null;
     }

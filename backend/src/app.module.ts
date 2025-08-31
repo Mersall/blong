@@ -13,6 +13,7 @@ import { QuestionnaireModule } from './questionnaire/questionnaire.module';
 import { QuizModule } from './quiz/quiz.module';
 import { DateDeliveryModule } from './date-delivery/date-delivery.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { MatchingModule } from './matching/matching.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { NotificationsModule } from './notifications/notifications.module';
     QuizModule,
     DateDeliveryModule,
     NotificationsModule,
+    MatchingModule,
   ],
   controllers: [AppController],
   providers: [AppService],

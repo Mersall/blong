@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Put,
   Body,
   Param,
   UseGuards,
@@ -14,12 +15,18 @@ import {
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { DateDeliveryService } from './date-delivery.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CreatePaymentDto, ConfirmPaymentDto } from './dto/payments.dto';
+import { AppConfigService } from '../config/config.service';
+
 
 @ApiTags('Date Delivery')
 @Controller('date-delivery')
 @UseGuards(JwtAuthGuard)
 export class DateDeliveryController {
-  constructor(private readonly dateDeliveryService: DateDeliveryService) {}
+  constructor(
+    private readonly dateDeliveryService: DateDeliveryService,
+    private readonly config: AppConfigService,
+  ) {}
 
   @Get('dates')
   @HttpCode(HttpStatus.OK)
@@ -76,6 +83,36 @@ export class DateDeliveryController {
   ) {
     return this.dateDeliveryService.getPotentialMatches(req.user.id, limit);
   }
+
+  @Post('dates/payment')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Create payment intent for delivered date', description: 'Initiate payment for a delivered date' })
+  @ApiResponse({ status: 201, description: 'Payment initiated successfully' })
+  async createPayment(
+    @Request() req: any,
+    @Body(ValidationPipe) createDto: CreatePaymentDto,
+  ) {
+    if (!this.config.paymentsEnabled) {
+      return { statusCode: 501, message: 'Payments are disabled' };
+    }
+    return this.dateDeliveryService.createPayment(req.user.id, createDto);
+  }
+
+  @Put('dates/payment/confirm')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Confirm payment for delivered date', description: 'Confirm a payment intent and mark as completed' })
+  @ApiResponse({ status: 200, description: 'Payment confirmed successfully' })
+  async confirmPayment(
+    @Request() req: any,
+    @Body(ValidationPipe) confirmDto: ConfirmPaymentDto,
+  ) {
+    if (!this.config.paymentsEnabled) {
+      return { statusCode: 501, message: 'Payments are disabled' };
+    }
+    return this.dateDeliveryService.confirmPayment(req.user.id, confirmDto);
+  }
+
+
 
   @Post('matches/generate')
   @HttpCode(HttpStatus.OK)

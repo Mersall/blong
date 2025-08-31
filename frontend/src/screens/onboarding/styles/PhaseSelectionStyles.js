@@ -79,13 +79,14 @@ export const styles = StyleSheet.create({
 
   // Phase option card
   phaseCard: {
-    borderRadius: 12,
+    borderRadius: 8,
     padding: 24,
-    marginBottom: 20,
+    marginBottom: 16,
     shadowColor: COLORS.shadow,
-    shadowOffset: { width: 0, height: 8 },
-    shadowRadius: 16,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 12,
+    shadowOpacity: 0.05,
+    elevation: 2,
     overflow: 'hidden',
   },
 
@@ -113,6 +114,27 @@ export const styles = StyleSheet.create({
   phaseIcon: {
     fontSize: 32,
     marginRight: 16,
+  },
+
+  // Button styles should follow Premium Buttons standard
+  primaryButton: {
+    backgroundColor: COLORS.accent,
+    paddingHorizontal: 32,
+    paddingVertical: 12,
+    borderRadius: 24,
+    shadowColor: COLORS.accent,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+
+  primaryButtonText: {
+    color: COLORS.background,
+    fontSize: 14,
+    fontWeight: '500',
+    letterSpacing: 0.5,
+    textAlign: 'center',
   },
 
   phaseTextContent: {
@@ -233,11 +255,11 @@ export const styles = StyleSheet.create({
   },
 });
 
-// Phase gradient configurations
+// Phase gradient configurations (disabled per BLONG rules)
 export const PHASE_GRADIENTS = {
-  single: ['#FF6B35', '#FF8A65'],
-  engagement: ['#FFD700', '#FFA000'],
-  wedding: ['#FF6B35', '#FFD700'],
+  single: undefined,
+  engagement: undefined,
+  wedding: undefined,
 };
 
 // RTL-aware style helpers

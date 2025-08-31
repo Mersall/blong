@@ -83,22 +83,22 @@ export default {
     // Relationship phases
     phases: {
       single: {
-        title: 'Single',
-        subtitle: 'Request a Date',
-        description: 'Request a date and our AI will curate the perfect venue and arrange everything for you',
-        icon: '💝',
+        title: 'Singles Journey',
+        subtitle: 'Self-Discovery & Clarity',
+        description: 'Define your values and preferences while we prepare the perfect introductions and experiences for you',
+        icon: '🌸',
       },
-      engagement: {
-        title: 'Engagement',
-        subtitle: 'Planning Together',
-        description: 'Engaged and planning your future together with your partner',
+      preparing: {
+        title: 'Preparing for Engagement',
+        subtitle: 'Planning & Alignment',
+        description: 'Build a shared vision, align values, and plan meaningful steps together',
+        icon: '💕',
+      },
+      engaged: {
+        title: 'Before Engagement',
+        subtitle: 'Focused & Elegant',
+        description: 'Curated experiences and decisions as you step into a committed future',
         icon: '💍',
-      },
-      engagement_day_prep: {
-        title: 'Engagement Day Prep',
-        subtitle: 'Final Preparations',
-        description: 'Getting ready for your engagement day with all the final touches and preparations',
-        icon: '✨',
       },
     },
   },

@@ -33,16 +33,10 @@ const createColors = (language) => {
     info: '#2196F3',
   };
 
-  // Cultural accent colors based on language
-  if (language === 'ar') {
-    colors.accent = '#D4AF37'; // Gold for Arabic
-    colors.accentLight = '#FFD700';
-    colors.accentDark = '#B8860B';
-  } else {
-    colors.accent = '#FF6B35'; // Coral for others
-    colors.accentLight = '#FF8A65';
-    colors.accentDark = '#E64A19';
-  }
+  // Fixed brand accent color per BLONG rules
+  colors.accent = '#FF6B35';
+  colors.accentLight = '#FF6B35';
+  colors.accentDark = '#FF6B35';
 
   return colors;
 };

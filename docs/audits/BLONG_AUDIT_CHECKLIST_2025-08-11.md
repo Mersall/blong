@@ -6,46 +6,46 @@ Legend: [ ] Not started  [/] In progress  [x] Done  [-] Cancelled
 
 ## P0 — Immediate (This Sprint)
 
-- [ ] Backend Payments (2–4 days)
-  - [ ] Implement POST /date-delivery/dates/payment
-  - [ ] Implement PUT /date-delivery/dates/payment/confirm
-  - [ ] Payment provider integration stub/config (Stripe or Paymob) via AppConfigModule
-  - [ ] Create DTOs + class-validator + ValidationPipe
-  - [ ] Minimal e2e tests for payment flow
-  - Owner: —  Status: [ ]
+- [x] Backend Payments (2–4 days)
+  - [x] Implement POST /date-delivery/dates/payment
+  - [x] Implement PUT /date-delivery/dates/payment/confirm
+  - [x] Payment provider integration stub/config (Stripe or Paymob) via AppConfigModule
+  - [x] Create DTOs + class-validator + ValidationPipe
+  - [x] Minimal e2e tests for payment flow
+  - Owner: Augment —  Status: [x]
 
-- [ ] Backend Matching Engine (4–7 days)
-  - [ ] Create MatchesModule in NestJS
-  - [ ] Move aiCompatibilityEngine logic to backend service
-  - [ ] Persist personality profiles and matches (user_personality_profiles, matches)
-  - [ ] Endpoints: GET /matches, GET /matches/:id (and supporting quiz endpoints if needed)
-  - [ ] Implement weights: Personality 40, Preference 30, Value 20, Interaction 10; min score 75
-  - [ ] Unit tests for scoring functions and endpoints
-  - Owner: —  Status: [ ]
+- [x] Backend Matching Engine (4–7 days)
+  - [x] Create MatchesModule in NestJS
+  - [x] Move aiCompatibilityEngine logic to backend service
+  - [x] Persist personality profiles and matches (user_personality_profiles, matches)
+  - [x] Endpoints: GET /matches, GET /matches/:id (and supporting quiz endpoints if needed)
+  - [x] Implement weights: Personality 40, Preference 30, Value 20, Interaction 10; min score 75
+  - [x] Unit tests for scoring functions and endpoints
+  - Owner: Augment —  Status: [x]
 
-- [ ] Onboarding ThemeSelection + Phase Alignment (1–1.5 days)
-  - [ ] Add ThemeSelection screen (between LanguageSelection and PhaseSelection)
-  - [ ] Update OnboardingFlow sequence: Language -> Theme -> Phase
-  - [ ] Align phase IDs: single, preparing, engaged
-  - [ ] Update i18n keys/translations accordingly
-  - Owner: —  Status: [ ]
+- [x] Onboarding ThemeSelection + Phase Alignment (1–1.5 days)
+  - [x] Add ThemeSelection screen (between LanguageSelection and PhaseSelection)
+  - [x] Update OnboardingFlow sequence: Language -> Theme -> Phase
+  - [x] Align phase IDs: single, preparing, engaged
+  - [x] Update i18n keys/translations accordingly
+  - Owner: Augment —  Status: [x]
 
-- [ ] Design System Lock (1–2 days)
-  - [ ] Replace dynamic accent in AppContext with fixed COLORS palette
-  - [ ] Remove gradients from card backgrounds (allow accent line only)
-  - [ ] Enforce border radius: 8px (cards), 24px (buttons)
-  - [ ] Enforce spacing system: 8/16/24/32/40/48 px
-  - [ ] Replace non-compliant tokens/usages in onboarding and core screens
-  - Owner: —  Status: [ ]
+- [x] Design System Lock (1–2 days)
+  - [x] Replace dynamic accent in AppContext with fixed COLORS palette
+  - [x] Remove gradients from card backgrounds (allow accent line only)
+  - [x] Enforce border radius: 8px (cards), 24px (buttons)
+  - [x] Enforce spacing system: 8/16/24/32/40/48 px
+  - [x] Replace non-compliant tokens/usages in onboarding and core screens
+  - Owner: Augment —  Status: [x]
 
 ## P1 — Next Sprint
 
-- [ ] Navigation Consolidation (1.5–2.5 days)
-  - [ ] Add NavigationContainer at App root
+- [x] Navigation Consolidation (1.5–2.5 days)
+  - [x] Add NavigationContainer at App root
   - [ ] Migrate MainNavigator to React Navigation (stack/tab)
-  - [ ] Remove MainNavigator_old.js
+  - [x] Remove MainNavigator_old.js
   - [ ] Reduce/replace navigationService usages where RN navigation is available
-  - Owner: —  Status: [ ]
+  - Owner: Augment —  Status: [/] (partially complete)
 
 - [ ] Services/Utilities Cleanup (1–2 days)
   - [ ] Merge apiService and enhancedApiService (one client)
